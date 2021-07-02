@@ -50,7 +50,7 @@ struct VBHS* return_v()
 int RegisterVblankHandler(int number, int priority, int (*handler)(struct VBHS*), struct VBHS* this)
 {
 	struct DCLL *p, *list;
-	u32 x;
+	int x;
 
 	if (QueryIntrContext())
 	{
@@ -103,7 +103,7 @@ int RegisterVblankHandler(int number, int priority, int (*handler)(struct VBHS*)
 int ReleaseVblankHandler(int number, int (*handler)(struct VBHS*))
 {
 	struct DCLL *p, *list;
-	u32 x;
+	int x;
 
 	if (QueryIntrContext())
 		return ERROR_INTR_CONTEXT;
@@ -285,7 +285,7 @@ struct export export_stub = {
 int _start()
 {
 	iop_event_t e;
-	u32 x;
+	int x;
 	int i;
 
 	CpuSuspendIntr(&x);

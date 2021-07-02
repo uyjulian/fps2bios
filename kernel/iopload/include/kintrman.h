@@ -31,8 +31,8 @@ int ReleaseIntrHandler(int interrupt); //5 (18)
 int EnableIntr(int interrupt); //6 (13,18)
 int DisableIntr(int interrupt, int* oldstat); //7 (18)
 int CpuEnableIntr(); //9 (18,21,26)
-int CpuSuspendIntr(u32* ictrl); //17(05,06,07,13,14,18,26)
-int CpuResumeIntr(u32 ictrl); //18(05,06,07,13,14,18,26)
+int CpuSuspendIntr(int* ictrl); //17(05,06,07,13,14,18,26)
+int CpuResumeIntr(int ictrl); //18(05,06,07,13,14,18,26)
 int QueryIntrContext(); //23(07,13)
 
 #endif //__INTRMAN_H__

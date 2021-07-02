@@ -111,7 +111,7 @@ int intrman_call3()
 //
 int RegisterIntrHandler(int interrupt, int mode, intrh_func handler, void* arg)
 {
-	u32 ictrl;
+	int ictrl;
 
 	_dprintf("%s interrupt=%x, mode=%x\n", __FUNCTION__, interrupt, mode);
 	if (QueryIntrContext())
@@ -155,7 +155,7 @@ int RegisterIntrHandler(int interrupt, int mode, intrh_func handler, void* arg)
 ///////////////////////////////////////////////////////////////////////
 int ReleaseIntrHandler(int interrupt)
 {
-	u32 ictrl;
+	int ictrl;
 
 	if (QueryIntrContext())
 	{
@@ -185,7 +185,7 @@ int ReleaseIntrHandler(int interrupt)
 }
 
 ///////////////////////////////////////////////////////////////////////
-int CpuSuspendIntr(u32* ictrl)
+int CpuSuspendIntr(int* ictrl)
 {
 	u32 rval = ICTRL;
 	if (ictrl)
@@ -196,7 +196,7 @@ int CpuSuspendIntr(u32* ictrl)
 }
 
 ///////////////////////////////////////////////////////////////////////
-int CpuResumeIntr(u32 ictrl)
+int CpuResumeIntr(int ictrl)
 {
 	ICTRL = ictrl;
 	return 0;
@@ -296,7 +296,7 @@ int EnableIntr(int interrupt)
 	u32 low_irq = interrupt & 0xFF;
 	u32 high_irq = interrupt & 0xFFFFFF00;
 
-	u32 ictrl;
+	int ictrl;
 	CpuSuspendIntr(&ictrl);
 
 	if (interrupt < 0)
@@ -340,7 +340,7 @@ int EnableIntr(int interrupt)
 //not checked
 int DisableIntr(int interrupt, int* oldstat)
 {
-	u32 ictrl;
+	int ictrl;
 	u32 old_IMASK;
 	u32 low_irq;
 	u32 stat;
@@ -422,7 +422,7 @@ end:
 // Enable
 void intrman_call16(int interrupt)
 {
-	u32 ictrl;
+	int ictrl;
 	CpuSuspendIntr(&ictrl);
 
 	interrupt &= 0xFF;
@@ -447,7 +447,7 @@ void intrman_call16(int interrupt)
 // Disable
 void intrman_call15(int interrupt)
 {
-	u32 ictrl;
+	int ictrl;
 	CpuSuspendIntr(&ictrl);
 
 	interrupt &= 0xFF;
@@ -571,6 +571,7 @@ void SetCtxSwitchReqHandler(func handler)
 int ResetCtxSwitchReqHandler()
 {
 	context_switch_required_handler = default_ctx_switch_required_handler;
+	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -613,7 +614,7 @@ int iCatchMultiIntr()
 			u32 SR;
 			__asm__("mfc0 %0, $12\n"
 					: "=r"(SR));
-			if (SR & 1 == 0)
+			if ((SR & 1) == 0)
 			{
 				u32 set_SR = SR | 1;
 				__asm__ volatile(

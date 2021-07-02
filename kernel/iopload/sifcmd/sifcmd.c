@@ -183,7 +183,7 @@ void SifRemoveCmdHandler(unsigned int pos)
 ///////////////////////////////////////////////////////////////////////
 unsigned int sendCmd(unsigned int pos, int mode, SifCmdHdr* cp, int ps, void* src, void* dst, int size)
 {
-	u32 x;
+	int x;
 	struct sifman_DMA dma[2];
 	register int count, y;
 
@@ -279,7 +279,7 @@ int SIF1_handler(void* common)
 	packet = (SifCmdHdr*)buf;
 	if (packet->fcode < 0)
 	{
-		if (packet->fcode & 0x7FFFFFFF >= c->sysCmdBufferSize)
+		if ((packet->fcode & 0x7FFFFFFF) >= c->sysCmdBufferSize)
 			return 1;
 		scd = &c->sysCmdBuffer[packet->fcode & 0x7FFFFFFF];
 	}
@@ -302,17 +302,17 @@ int SIF1_handler(void* common)
 ///////////////////////////////////////////////////////////////////////
 RPC_PACKET* rpc_get_packet(struct tag_rpc_common* common)
 {
-	u32 x;
+	int x;
 	register int pid, i;
 	RPC_PACKET* packet;
 
 	CpuSuspendIntr(&x);
 
 	for (i = 0, packet = common->paddr; i < common->size; i++)
-		if (packet[i].rec_id & 2 == 0)
+		if ((packet[i].rec_id & 2) == 0)
 			goto found;
 	for (i = 0, packet = common->paddr2; i < common->size2; i++)
-		if (packet[i].rec_id & 2 == 0)
+		if ((packet[i].rec_id & 2) == 0)
 			goto found;
 
 	CpuResumeIntr(x);
@@ -398,7 +398,7 @@ int SifGetOtherData(struct sifcmd_RPC_RECEIVE_DATA* rd, void* src, void* dst, in
 	packet->dst = dst;
 	packet->size = size;
 
-	if (mode & 1 == 0)
+	if ((mode & 1) == 0)
 	{
 		rd->hdr.tid = GetThreadId();
 		if (SifSendCmd(0x8000000C, packet, 0x40, 0, 0, 0) == 0)
@@ -477,7 +477,7 @@ int SifBindRpc(struct sifcmd_RPC_CLIENT_DATA* client, unsigned int number, unsig
 	packet->client = client;
 	packet->fno = number;
 
-	if (mode & 1 == 0)
+	if ((mode & 1) == 0)
 	{
 		client->hdr.tid = GetThreadId();
 		if (SifSendCmd(0x80000009, packet, 0x40, 0, 0, 0) == 0)
@@ -566,7 +566,7 @@ int SifCheckStatRpc(struct sifcmd_RPC_HEADER* rd)
 ///////////////////////////////////////////////////////////////////////[13]
 void SifSetRpcQueue(struct sifcmd_RPC_DATA_QUEUE* qd, int key)
 {
-	u32 x;
+	int x;
 	register struct sifcmd_RPC_DATA_QUEUE *q, *i;
 
 	CpuSuspendIntr(&x);
@@ -592,7 +592,7 @@ void SifRegisterRpc(struct sifcmd_RPC_SERVER_DATA* sd, u32 command,
 	rpch_func cfunc, void* cbuff,
 	struct sifcmd_RPC_DATA_QUEUE* qd)
 {
-	u32 x;
+	int x;
 	register struct sifcmd_RPC_DATA_QUEUE *q, *i;
 
 	CpuSuspendIntr(&x);
@@ -619,7 +619,7 @@ void SifRegisterRpc(struct sifcmd_RPC_SERVER_DATA* sd, u32 command,
 ///////////////////////////////////////////////////////////////////////[18]
 struct sifcmd_RPC_SERVER_DATA* SifRemoveRpc(struct sifcmd_RPC_SERVER_DATA* sd, struct sifcmd_RPC_DATA_QUEUE* qd)
 {
-	u32 x;
+	int x;
 	register struct sifcmd_RPC_SERVER_DATA* s;
 
 	CpuSuspendIntr(&x);
@@ -640,7 +640,7 @@ struct sifcmd_RPC_SERVER_DATA* SifRemoveRpc(struct sifcmd_RPC_SERVER_DATA* sd, s
 ///////////////////////////////////////////////////////////////////////[19]
 struct sifcmd_RPC_DATA_QUEUE* SifRemoveRpcQueue(struct sifcmd_RPC_DATA_QUEUE* qd)
 {
-	u32 x;
+	int x;
 	register struct sifcmd_RPC_DATA_QUEUE* q;
 
 	CpuSuspendIntr(&x);
@@ -668,7 +668,7 @@ struct sifcmd_RPC_DATA_QUEUE* SifRemoveRpcQueue(struct sifcmd_RPC_DATA_QUEUE* qd
 ///////////////////////////////////////////////////////////////////////[14]
 struct sifcmd_RPC_SERVER_DATA* SifGetNextRequest(struct sifcmd_RPC_DATA_QUEUE* qd)
 {
-	u32 x;
+	int x;
 	register struct sifcmd_RPC_SERVER_DATA* s;
 
 	CpuSuspendIntr(&x);
@@ -688,14 +688,15 @@ struct sifcmd_RPC_SERVER_DATA* SifGetNextRequest(struct sifcmd_RPC_DATA_QUEUE* q
 ///////////////////////////////////////////////////////////////////////[15]
 void SifExecRequest(struct sifcmd_RPC_SERVER_DATA* sd)
 {
-	u32 x;
+	int x;
 	register int size, id, count, i;
 	register void* buff;
 	RPC_PACKET_END* epacket;
 	struct sifman_DMA dma[2];
 
 	size = 0;
-	if (buff = sd->func(sd->fno, sd->buff, sd->size))
+	buff = sd->func(sd->fno, sd->buff, sd->size);
+	if (buff != 0)
 		size = sd->rsize;
 
 	CpuSuspendIntr(&x);
@@ -750,7 +751,8 @@ void SifRpcLoop(struct sifcmd_RPC_DATA_QUEUE* qd)
 
 	do
 	{
-		if (s = SifGetNextRequest(qd))
+		s = SifGetNextRequest(qd);
+		if (s != 0)
 			SifExecRequest(s);
 		else
 			SleepThread();
@@ -760,7 +762,7 @@ void SifRpcLoop(struct sifcmd_RPC_DATA_QUEUE* qd)
 ///////////////////////////////////////////////////////////////////////[0E]
 void SifInitRpc(int mode)
 {
-	u32 x;
+	int x;
 	_dprintf("%s\n", __FUNCTION__);
 
 	SifInitCmd();
@@ -841,10 +843,12 @@ struct export sifcmd_stub = {
 //////////////////////////////entrypoint///////////////////////////////[00]
 int _start()
 {
-	register int *v, i;
+	register u32 *v;
+	register int i;
 
 	_dprintf("%s\n", __FUNCTION__);
-	if (v = QueryBootMode(3))
+	v = QueryBootMode(3);
+	if (v != 0)
 	{
 		_dprintf("bootmode: %x\n", v[1]);
 		if (v[1] & 1)

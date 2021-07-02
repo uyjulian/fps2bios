@@ -42,5 +42,5 @@ int  Kprintf(const char *format, ...) {
 */
 void _start()
 {
-	Kputs("STDIO start\n");
+	Kputs((u8 *)"STDIO start\n");
 }

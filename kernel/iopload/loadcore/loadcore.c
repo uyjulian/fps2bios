@@ -190,7 +190,7 @@ int check_import_table(struct import* imp)
 	{
 		if (f->addiu0 >> 26 != INS_ADDIU)
 			return 0;
-		if ((f->jr_ra != INS_JR_RA) && (f->jr_ra > 26 != INS_JR))
+		if ((f->jr_ra != INS_JR_RA) && (f->jr_ra >> 26 != INS_JR))
 			return 0;
 	}
 	if (f->addiu0)
@@ -514,6 +514,7 @@ int ReleaseLibraryEntries(struct export* e)
 {
 	register struct export *n, *p, *next, *prev;
 
+	prev = 0;
 	p = lc_internals.let_next;
 	while ((p) && (p != e))
 	{
@@ -596,17 +597,17 @@ void _FlushIcache()
 
 	__asm__("mtc0 %0, $12\n" ::"r"(0));
 
-	s1450 = *(int*)0xBF801450;
-	*(int*)0xBF801450 &= ~1;
-	*(int*)0xBF801450;
+	s1450 = *(volatile int*)0xBF801450;
+	*(volatile int*)0xBF801450 &= ~1;
+	*(volatile int*)0xBF801450;
 
-	s1578 = *(int*)0xBF801578;
-	*(int*)0xBF801578 = 0;
-	*(int*)0xBF801578;
+	s1578 = *(volatile int*)0xBF801578;
+	*(volatile int*)0xBF801578 = 0;
+	*(volatile int*)0xBF801578;
 
-	icache = *(int*)0xFFFE0130;
-	*(int*)0xFFFE0130 = 0xC04;
-	*(int*)0xFFFE0130;
+	icache = *(volatile int*)0xFFFE0130;
+	*(volatile int*)0xFFFE0130 = 0xC04;
+	*(volatile int*)0xFFFE0130;
 
 	__asm__("mtc0 %0, $12\n" ::"r"(0x10000));
 
@@ -615,12 +616,12 @@ void _FlushIcache()
 
 	__asm__("mtc0 %0, $12\n" ::"r"(0));
 
-	*(int*)0xFFFE0130 = icache;
-	*(int*)0xFFFE0130;
-	*(int*)0xBF801578 = s1578;
-	*(int*)0xBF801578;
-	*(int*)0xBF801450 = s1450;
-	*(int*)0xBF801450;
+	*(volatile int*)0xFFFE0130 = icache;
+	*(volatile int*)0xFFFE0130;
+	*(volatile int*)0xBF801578 = s1578;
+	*(volatile int*)0xBF801578;
+	*(volatile int*)0xBF801450 = s1450;
+	*(volatile int*)0xBF801450;
 
 	__asm__("mtc0 %0, $12\n"
 			:
@@ -654,17 +655,17 @@ void _FlushDcache()
 
 	__asm__("mtc0 %0, $12\n" ::"r"(0));
 
-	s1450 = *(int*)0xBF801450;
-	*(int*)0xBF801450 &= ~1;
-	*(int*)0xBF801450;
+	s1450 = *(volatile int*)0xBF801450;
+	*(volatile int*)0xBF801450 &= ~1;
+	*(volatile int*)0xBF801450;
 
-	s1578 = *(int*)0xBF801578;
-	*(int*)0xBF801578 = 0;
-	*(int*)0xBF801578;
+	s1578 = *(volatile int*)0xBF801578;
+	*(volatile int*)0xBF801578 = 0;
+	*(volatile int*)0xBF801578;
 
-	icache = *(int*)0xFFFE0130;
-	*(int*)0xFFFE0130 = 0xC4;
-	*(int*)0xFFFE0130;
+	icache = *(volatile int*)0xFFFE0130;
+	*(volatile int*)0xFFFE0130 = 0xC4;
+	*(volatile int*)0xFFFE0130;
 
 	__asm__("mtc0 %0, $12\n" ::"r"(0x10000));
 
@@ -673,12 +674,12 @@ void _FlushDcache()
 
 	__asm__("mtc0 %0, $12\n" ::"r"(0));
 
-	*(int*)0xFFFE0130 = icache;
-	*(int*)0xFFFE0130;
-	*(int*)0xBF801578 = s1578;
-	*(int*)0xBF801578;
-	*(int*)0xBF801450 = s1450;
-	*(int*)0xBF801450;
+	*(volatile int*)0xFFFE0130 = icache;
+	*(volatile int*)0xFFFE0130;
+	*(volatile int*)0xBF801578 = s1578;
+	*(volatile int*)0xBF801578;
+	*(volatile int*)0xBF801450 = s1450;
+	*(volatile int*)0xBF801450;
 
 	__asm__("mtc0 %0, $12\n"
 			:
@@ -708,8 +709,8 @@ void _SetIcache(u32 val)
 
 	__asm__("mtc0 %0, $12\n" ::"r"(0));
 
-	*(int*)0xFFFE0130 = val;
-	*(int*)0xFFFE0130;
+	*(volatile int*)0xFFFE0130 = val;
+	*(volatile int*)0xFFFE0130;
 
 	__asm__("mtc0 %0, $12\n"
 			:
@@ -789,7 +790,8 @@ int _ReadModuleHeader(void* image, fileInfo* result)
 		result->moduleinfo = (moduleInfo*)im->moduleinfo;
 		return result->type;
 	}
-	return result->type = -1;
+	result->type = -1;
+	return -1;
 }
 
 #define MODULE_TYPE_COFF 1
@@ -929,6 +931,7 @@ int lc_memcpy(void* src, void* dest, int len)
 	char* _dst = (char*)dest;
 	for (len = len; len > 0; len--)
 		*_dst++ = *_src++;
+	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////[OK]
@@ -936,6 +939,7 @@ int lc_zeromem(void* addr, int len)
 {
 	for (; len > 0; len--)
 		*(char*)addr++ = 0;
+	return 0;
 }
 
 int lc_strlen(char* s)
@@ -974,7 +978,7 @@ void* lc_memcpy_overlapping(char* dst, char* src, int len)
 //////////////////////////////entrypoint///////////////////////////////
 void _start(BOOT_PARAMS* init)
 {
-	*(int*)0xFFFE0130 = 0x1e988;
+	*(volatile int*)0xFFFE0130 = 0x1e988;
 	__asm__(
 		"addiu $26, $0, 0\n"
 		"mtc0  $26, $12\n");
@@ -1097,9 +1101,10 @@ void loadcore_start(BOOT_PARAMS* pInitParams)
 
 				case MODULE_TYPE_2:
 				case MODULE_TYPE_IOPRELEXEC:
-					if (fi.p1_vaddr = (u32)((s1 == 0) ?
+					fi.p1_vaddr = (u32)((s1 == 0) ?
                                                 AllocSysMemory(0, fi.p1_memsz + 0x30, 0) :
-                                                AllocSysMemory(2, fi.p1_memsz + 0x30, (void*)s1)))
+                                                AllocSysMemory(2, fi.p1_memsz + 0x30, (void*)s1));
+					if (fi.p1_vaddr != 0)
 						fi.p1_vaddr += 0x30;
 					else
 						goto HALT;

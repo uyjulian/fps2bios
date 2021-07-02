@@ -13,7 +13,9 @@
 #include "varargs.h"
 #endif
 
+#if 0
 static char* parse_number();
+#endif
 static long get_number();
 static void print_number();
 static void write_char(char c);
@@ -124,7 +126,7 @@ va_dcl
 					//	      write_string (unctrl (c));
 					//	      break;
 				case 'p':
-					l = (void*)va_arg(args, char*);
+					l = (long)va_arg(args, char*);
 					print_number(16, 1, l);
 					break;
 				case 'd':
@@ -144,20 +146,21 @@ va_dcl
 	va_end(args);
 }
 
+#if 0
 static int isdigit(int c)
 {
 	if (c >= '0' && c <= '9')
 		return 1;
 	return 0;
 }
+#endif
 
 /* Parse a positive decimal integer at S.
    FIXME: Was used in earlier version, but not currently used.
    Keep for now.  */
 
-static char*
-	parse_number(s, p) char* s;
-long* p;
+#if 0
+static char* parse_number(char *s, long *p)
 {
 	long x = 0;
 
@@ -170,6 +173,7 @@ long* p;
 	*p = x;
 	return s;
 }
+#endif
 
 /* Fetch the number at S of SIZE bytes.  */
 
@@ -260,7 +264,7 @@ write_char(char c)
 static void
 write_string(char* s)
 {
-	__puts(s);
+	__puts((u8 *)s);
 }
 
 

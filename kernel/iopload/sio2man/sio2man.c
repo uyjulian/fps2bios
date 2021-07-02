@@ -462,7 +462,7 @@ int sio2_interruptHandler(struct sio2common* c)
 // Export 0
 int sio2_init(void)
 {
-	u32 oldStat;
+	int oldStat;
 
 	//	_dprintf("%s\n", __FUNCTION__);
 
@@ -504,7 +504,7 @@ int sio2_init(void)
 
 void sio2_deInit(void)
 {
-	u32 oldStat;
+	int oldStat;
 
 	//	_dprintf("%s\n", __FUNCTION__);
 

@@ -50,7 +50,7 @@ ROMDIR_INFO* searchRomDir(const u32* searchStartAddr, const u32* searchEndAddr, 
 ROMFILE_INFO* searchFileInRom(const ROMDIR_INFO* romdirInfo, const char* filename, ROMFILE_INFO* fileinfo)
 {
 	register ROMDIR_ENTRY* dir_entry;
-	register ext_offset = 0, file_offset = 0;
+	register int ext_offset = 0, file_offset = 0;
 	int i;
 
 	for (dir_entry = romdirInfo->romdirPtr; dir_entry->name[0]; dir_entry++)

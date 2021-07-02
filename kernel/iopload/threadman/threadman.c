@@ -145,6 +145,7 @@ int _start()
 	//	RegisterLibraryEntries(&thvpool_stub);
 
 	CpuEnableIntr();
+	return 0;
 }
 
 #if 0

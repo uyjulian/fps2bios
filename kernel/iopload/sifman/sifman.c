@@ -100,7 +100,7 @@ void SifSIF2Init()
 ///////////////////////////////////////////////////////////////////////[05]
 void SifInit()
 {
-	u32 x, y;
+	int x, y;
 	u32 msflag;
 
 	_dprintf("%s: sifInit=%d\n", __FUNCTION__, sifInit);
@@ -190,12 +190,12 @@ int Sif0Handler(void* common)
 	if (vars->function)
 		vars->function(vars->param);
 
-	if ((DMAch_SIF9_CHCR & DMAf_TR == 0) && (vars->index > 0))
+	if (((DMAch_SIF9_CHCR & DMAf_TR) == 0) && (vars->index > 0))
 	{
 		DMAch_SIF9_CHCR = 0;
 		DMAch_SIF9_TADR = (int)vars->crtbuf;
 		DMAch_SIF9_BCR = 32;
-		if (BD4 & 0x20 == 0)
+		if ((BD4 & 0x20) == 0)
 			BD4 = 0x20;
 		vars->id++;
 		if (vars->crtbuf == vars->buf1)
@@ -214,7 +214,7 @@ int Sif0Handler(void* common)
 ///////////////////////////////////////////////////////////////////////
 void RegisterSif0Handler()
 {
-	u32 x;
+	int x;
 	vars.index = 0;
 	vars.crtbuf = vars.buf1;
 	vars.function = NULL;
@@ -287,7 +287,7 @@ int SifDmaStat(u32 id)
 	{
 		if (id >> 16 == vars.id)
 			return 1; //waiting in queue
-		if (id >> 16 + 1 == vars.id)
+		if ((id >> 16) + 1 == vars.id)
 			return 0; //running
 	}
 	return -1; //terminated
@@ -306,7 +306,7 @@ void SifSend(struct sifman_DMA sd)
 		one.count |= 0x80000000;
 	one.addr = (u32)sd.addr & 0xFFFFFFF;
 
-	if (BD4 & 0x20 == 0)
+	if ((BD4 & 0x20) == 0)
 		BD4 = 0x20;
 
 	DMAch_SIF9_CHCR = 0;
@@ -334,7 +334,7 @@ void SifSetSIF0DMA(void* data, int size, int attr)
 {
 	size = size / 4 + ((size & 3) > 0);
 
-	if (BD4 & 0x20 == 0)
+	if ((BD4 & 0x20) == 0)
 		BD4 = 0x20;
 
 	DMAch_SIF9_CHCR = 0;
@@ -363,7 +363,7 @@ void SifSetSIF1DMA(void* data, int size, int attr)
 {
 	size = size / 4 + ((size & 3) > 0);
 
-	if (BD4 & 0x40 == 0)
+	if ((BD4 & 0x40) == 0)
 		BD4 = 0x40;
 
 	DMAch_SIFA_CHCR = 0;
@@ -393,7 +393,7 @@ void SifSetSIF2DMA(void* data, int size, int attr)
 {
 	size = size / 4 + ((size & 3) > 0);
 
-	if (BD4 & 0x80 == 0)
+	if ((BD4 & 0x80) == 0)
 		BD4 = 0x80;
 
 	DMAch_SIF2_CHCR = 0;

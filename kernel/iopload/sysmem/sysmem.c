@@ -248,7 +248,8 @@ int FreeSysMemory(void* mem)
 	for (table = alloclist; table; table = table->next) //must not be among
 		if (mem == table) //the allocation tables
 			return -1;
-	if (r = free(mem))
+	r = free(mem);
+	if (r != 0)
 		return r;
 	maintain();
 	return r; //r==0 ;-)
@@ -260,7 +261,8 @@ void* QueryBlockTopAddress(void* address)
 {
 	struct allocELEM* p;
 
-	if (p = findblock(address))
+	p = findblock(address);
+	if (p != 0)
 		return (void*)((mADDRESS(p->info) << 8) +
 					   (mALLOCATED(p->info) ? USED : FREE));
 	return (void*)-1;
@@ -271,7 +273,8 @@ int QueryBlockSize(void* address)
 {
 	struct allocELEM* p;
 
-	if (p = findblock(address))
+	p = findblock(address);
+	if (p != 0)
 		return (mSIZE(p->info) << 8) |
 			   (mALLOCATED(p->info) ? USED : FREE);
 	return -1;
@@ -296,6 +299,7 @@ void* alloc(int flags, int size, void* mem)
 	if (bsize == 0)
 		return NULL;
 
+	i = 0;
 	switch (flags)
 	{
 		case ALLOC_FIRST:
@@ -523,8 +527,10 @@ void maintain()
 	for (table = alloclist; table->next; table = table->next) //+0x00
 		; //move to last non-NULL
 	if (mSIZE(table->list[smCHECK].info) > 0) //+0xE0	//27 (i.e.28th)
+	{
+		new = (struct allocTABLE*)alloc(0, sizeof(struct allocTABLE), 0);
 		// a new table is needed; alloc it
-		if (new = (struct allocTABLE*)alloc(0, sizeof(struct allocTABLE), 0))
+		if (new != 0)
 		{
 			table->next = new; // link it
 			table->list[smLAST].next = &new->list[smFIRST]; // link it's table elements
@@ -537,6 +543,7 @@ void maintain()
 			}
 			table->list[smLAST].next = NULL;
 		}
+	}
 
 	table = alloclist;
 	if (table->next)
