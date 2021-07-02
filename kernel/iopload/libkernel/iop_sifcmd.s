@@ -22,94 +22,94 @@ sifcmd_stub:
 	.ascii	"sifcmd\0\0"
 	.align	2
 
-	.globl  SifInitCmd			# 0x04
-SifInitCmd:
+	.globl  sceSifInitCmd			# 0x04
+sceSifInitCmd:
 	j	$31
 	li	$0, 0x04
 
-	.globl	SifExitCmd			# 0x05
-SifExitCmd:
+	.globl	sceSifExitCmd			# 0x05
+sceSifExitCmd:
 	j	$31
 	li	$0, 0x05
 
-	.globl	SifGetSreg			# 0x06
-SifGetSreg:
+	.globl	sceSifGetSreg			# 0x06
+sceSifGetSreg:
 	j	$31
 	li	$0, 0x06
 
-	.globl	SifSetSreg			# 0x07
-SifSetSreg:
+	.globl	sceSifSetSreg			# 0x07
+sceSifSetSreg:
 	j	$31
 	li	$0, 0x07
 
-	.globl	SifSetCmdBuffer			# 0x08
-SifSetCmdBuffer:
+	.globl	sceSifSetCmdBuffer			# 0x08
+sceSifSetCmdBuffer:
 	j	$31
 	li	$0, 0x08
 
 
-	.globl	SifAddCmdHandler		# 0x0a
-SifAddCmdHandler:
+	.globl	sceSifAddCmdHandler		# 0x0a
+sceSifAddCmdHandler:
 	j	$31
 	li	$0, 0x0a
 
-	.globl	SifRemoveCmdHandler		# 0x0b
-SifRemoveCmdHandler:
+	.globl	sceSifRemoveCmdHandler		# 0x0b
+sceSifRemoveCmdHandler:
 	j	$31
 	li	$0, 0x0b
 
-	.globl  SifSendCmd			# 0x0c
-SifSendCmd:
+	.globl  sceSifSendCmd			# 0x0c
+sceSifSendCmd:
 	j	$31
 	li	$0, 0x0c
 
-	.globl	iSifSendCmd			# 0x0d
-iSifSendCmd:
+	.globl	isceSifSendCmd			# 0x0d
+isceSifSendCmd:
 	j	$31
 	li	$0, 0x0d
 
-	.globl	SifInitRpc			# 0x0E
-SifInitRpc:
+	.globl	sceSifInitRpc			# 0x0E
+sceSifInitRpc:
 	j	$31
 	li	$0, 0x0E
 
-	.globl	SifBindRpc			# 0x0F
-SifBindRpc:
+	.globl	sceSifBindRpc			# 0x0F
+sceSifBindRpc:
 	j	$31
 	li	$0, 0x0F
 
-	.globl	SifCallRpc			# 0x10
-SifCallRpc:
+	.globl	sceSifCallRpc			# 0x10
+sceSifCallRpc:
 	j	$31
 	li	$0, 0x10
 
-	.globl	SifRegisterRpc			# 0x11
-SifRegisterRpc:
+	.globl	sceSifRegisterRpc			# 0x11
+sceSifRegisterRpc:
 	j	$31
 	li	$0, 0x11
 
-	.globl	SifCheckStatRpc			# 0x12
-SifCheckStatRpc:
+	.globl	sceSifCheckStatRpc			# 0x12
+sceSifCheckStatRpc:
 	j	$31
 	li	$0, 0x12
 
-	.globl	SifSetRpcQueue			# 0x13
-SifSetRpcQueue:
+	.globl	sceSifSetRpcQueue			# 0x13
+sceSifSetRpcQueue:
 	j	$31
 	li	$0, 0x13
 
-	.globl	SifGetNextRequest		# 0x14
-SifGetNextRequest:
+	.globl	sceSifGetNextRequest		# 0x14
+sceSifGetNextRequest:
 	j	$31
 	li	$0, 0x14
 
-	.globl	SifExecRequest			# 0x15
-SifExecRequest:
+	.globl	sceSifExecRequest			# 0x15
+sceSifExecRequest:
 	j	$31
 	li	$0, 0x15
 
-	.globl	SifRpcLoop			# 0x16
-SifRpcLoop:
+	.globl	sceSifRpcLoop			# 0x16
+sceSifRpcLoop:
 	j	$31
 	li	$0, 0x16
 
@@ -118,13 +118,13 @@ SifRpcGetOtherData:
 	j	$31
 	li	$0, 0x17
 
-	.globl	SifRemoveRpc			# 0x18
-SifRemoveRpc:
+	.globl	sceSifRemoveRpc			# 0x18
+sceSifRemoveRpc:
 	j	$31
 	li	$0, 0x18
 
-	.globl	SifRemoveRpcQueue		# 0x19
-SifRemoveRpcQueue:
+	.globl	sceSifRemoveRpcQueue		# 0x19
+sceSifRemoveRpcQueue:
 	j	$31
 	li	$0, 0x19
 

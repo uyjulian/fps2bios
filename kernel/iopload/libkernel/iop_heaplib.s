@@ -25,23 +25,23 @@ CreateHeap:
 	j	$31
 	li	$0, 4
 
-	.globl	DestroyHeap			# 005
-DestroyHeap:
+	.globl	DeleteHeap			# 005
+DeleteHeap:
 	j	$31
 	li	$0, 5
 
-	.globl	HeapMalloc			# 006
-HeapMalloc:
+	.globl	AllocHeapMemory			# 006
+AllocHeapMemory:
 	j	$31
 	li	$0, 6
 
-	.globl	HeapFree			# 007
-HeapFree:
+	.globl	FreeHeapMemory			# 007
+FreeHeapMemory:
 	j	$31
 	li	$0, 7
 
-	.globl	HeapSize			# 008 
-HeapSize:
+	.globl	HeapTotalFreeSize			# 008 
+HeapTotalFreeSize:
 	j	$31
 	li	$0, 8 
 

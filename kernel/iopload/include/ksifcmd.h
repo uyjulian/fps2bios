@@ -162,16 +162,16 @@ typedef struct
 	void* data;
 } SifCmdData;
 
-void SifInitCmd(); //4 (21)
-void SifAddCmdHandler(int pos, cmdh_func func, void* data); //10(21)
-void SifInitRpc(int mode); //14(26)
-void SifRegisterRpc(struct sifcmd_RPC_SERVER_DATA* sd, u32 cmd,
+void sceSifInitCmd(); //4 (21)
+void sceSifAddCmdHandler(int pos, cmdh_func func, void* data); //10(21)
+void sceSifInitRpc(int mode); //14(26)
+void sceSifRegisterRpc(struct sifcmd_RPC_SERVER_DATA* sd, u32 cmd,
 	rpch_func func, void* buff,
 	rpch_func cfunc, void* cbuff,
 	struct sifcmd_RPC_DATA_QUEUE* dq); //17(26)
-void SifSetRpcQueue(struct sifcmd_RPC_DATA_QUEUE* dq, int thid); //19(26)
-void SifRpcLoop(struct sifcmd_RPC_DATA_QUEUE* dq); //22(26)
-int SifGetOtherData(struct sifcmd_RPC_RECEIVE_DATA* rd,
+void sceSifSetRpcQueue(struct sifcmd_RPC_DATA_QUEUE* dq, int thid); //19(26)
+void sceSifRpcLoop(struct sifcmd_RPC_DATA_QUEUE* dq); //22(26)
+int sceSifGetOtherData(struct sifcmd_RPC_RECEIVE_DATA* rd,
 	void* src, void* dst, int size, int mode); //23(26)
 
 #endif //__SIFCMD_H__

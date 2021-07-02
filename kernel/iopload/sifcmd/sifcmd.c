@@ -79,13 +79,13 @@ void cmd80000000_CHANGE_SADDR(SifCmdCSData* packet, struct tag_cmd_common* commo
 }
 
 ///////////////////////////////////////////////////////////////////////[06]
-int SifGetSreg(int index)
+int sceSifGetSreg(int index)
 {
 	return Sreg[index];
 }
 
 ///////////////////////////////////////////////////////////////////////[07]
-int SifSetSreg(int index, unsigned int value)
+int sceSifSetSreg(int index, unsigned int value)
 {
 	return Sreg[index] = value;
 }
@@ -103,7 +103,7 @@ void cmd80000002_INIT_CMD(SifCmdCSData* packet, struct tag_cmd_common* common)
 	if (packet->hdr.opt == 0)
 	{
 		iSetEventFlag(common->systemStatusFlag, 0x100);
-		SifSetEEIOPflags(0x20000);
+		sceSifSetMSFlag(0x20000);
 		common->saddr = packet->newaddr;
 	}
 	else
@@ -121,15 +121,15 @@ int SifDeinitCmd()
 }
 
 ///////////////////////////////////////////////////////////////////////[04]
-void SifInitCmd()
+void sceSifInitCmd()
 {
 	__printf("iopSifInitCmd\n");
-	SifSetIOPEEflags(0x20000);
+	sceSifSetSMFlag(0x20000);
 	WaitEventFlag(cmd_common.systemStatusFlag, 0x100, 0, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////[05]
-void SifExitCmd()
+void sceSifExitCmd()
 {
 	int x;
 	DisableIntr(INT_DMA10, &x);
@@ -137,7 +137,7 @@ void SifExitCmd()
 }
 
 ///////////////////////////////////////////////////////////////////////[08]
-SifCmdData* SifSetCmdBuffer(SifCmdData* cmdBuffer, int size)
+SifCmdData* sceSifSetCmdBuffer(SifCmdData* cmdBuffer, int size)
 {
 	register SifCmdData* old;
 	old = cmd_common.cmdBuffer;
@@ -147,7 +147,7 @@ SifCmdData* SifSetCmdBuffer(SifCmdData* cmdBuffer, int size)
 }
 
 ///////////////////////////////////////////////////////////////////////[09]
-SifCmdData* SifSetSysCmdBuffer(SifCmdData* sysCmdBuffer, int size)
+SifCmdData* sceSifSetSysCmdBuffer(SifCmdData* sysCmdBuffer, int size)
 {
 	register SifCmdData* old;
 	old = cmd_common.sysCmdBuffer;
@@ -157,7 +157,7 @@ SifCmdData* SifSetSysCmdBuffer(SifCmdData* sysCmdBuffer, int size)
 }
 
 ///////////////////////////////////////////////////////////////////////[0A]
-void SifAddCmdHandler(int pos, cmdh_func f, void* data)
+void sceSifAddCmdHandler(int pos, cmdh_func f, void* data)
 {
 	if (pos < 0)
 	{
@@ -172,7 +172,7 @@ void SifAddCmdHandler(int pos, cmdh_func f, void* data)
 }
 
 ///////////////////////////////////////////////////////////////////////[0B]
-void SifRemoveCmdHandler(unsigned int pos)
+void sceSifRemoveCmdHandler(unsigned int pos)
 {
 	if (pos < 0)
 		cmd_common.sysCmdBuffer[pos & 0x1FFFFFFF].func = 0;
@@ -214,37 +214,37 @@ unsigned int sendCmd(unsigned int pos, int mode, SifCmdHdr* cp, int ps, void* sr
 	dma[count - 1].size = ps; //on EE side after transfer;)
 	dma[count - 1].addr = cmd_common.saddr;
 	if (mode & 1) //interrupt mode
-		return SifSetDma(dma, count);
+		return sceSifSetDma(dma, count);
 	else
 	{
 		CpuSuspendIntr(&x);
-		y = SifSetDma(dma, count);
+		y = sceSifSetDma(dma, count);
 		CpuResumeIntr(x);
 		return y;
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////[0C]
-unsigned int SifSendCmd(unsigned int pos, void* cp, int ps, void* src, void* dst, int size)
+unsigned int sceSifSendCmd(unsigned int pos, void* cp, int ps, void* src, void* dst, int size)
 {
 	return sendCmd(pos, 0, cp, ps, src, dst, size);
 }
 
 ///////////////////////////////////////////////////////////////////////[0D]
-unsigned int iSifSendCmd(unsigned int pos, void* cp, int ps, void* src, void* dst, int size)
+unsigned int isceSifSendCmd(unsigned int pos, void* cp, int ps, void* src, void* dst, int size)
 {
 	return sendCmd(pos, 1, cp, ps, src, dst, size);
 }
 
 ///////////////////////////////////////////////////////////////////////[1A]
-void SifSet1CB(void* func, int param)
+void sceSifSetSif1CB(void* func, int param)
 {
 	cmd_common.func = func;
 	cmd_common.param = param;
 }
 
 ///////////////////////////////////////////////////////////////////////[1B]
-void SifReset1CB()
+void sceSifClearSif1CB()
 {
 	cmd_common.func = 0;
 	cmd_common.param = 0;
@@ -266,7 +266,7 @@ int SIF1_handler(void* common)
 
 	if ((ps = packet->psize & 0xFF) == 0)
 	{
-		SifSetDChain();
+		sceSifSetDChain();
 		return 1;
 	}
 	packet->psize = 0;
@@ -275,7 +275,7 @@ int SIF1_handler(void* common)
 	for (i = 0; i < ps; i++)
 		buf[i] = ((u32*)packet)[i];
 
-	SifSetDChain();
+	sceSifSetDChain();
 	packet = (SifCmdHdr*)buf;
 	if (packet->fcode < 0)
 	{
@@ -379,11 +379,11 @@ void cmd8000000C_RDATA(RPC_PACKET_RDATA* packet, struct tag_rpc_common* common)
 	epacket->command = 0x8000000C;
 	epacket->client = packet->client;
 
-	iSifSendCmd(0x80000008, epacket, 0x40, packet->src, packet->dst, packet->size);
+	isceSifSendCmd(0x80000008, epacket, 0x40, packet->src, packet->dst, packet->size);
 }
 
 ///////////////////////////////////////////////////////////////////////[17]
-int SifGetOtherData(struct sifcmd_RPC_RECEIVE_DATA* rd, void* src, void* dst, int size, int mode)
+int sceSifGetOtherData(struct sifcmd_RPC_RECEIVE_DATA* rd, void* src, void* dst, int size, int mode)
 {
 	RPC_PACKET_RDATA* packet;
 
@@ -401,14 +401,14 @@ int SifGetOtherData(struct sifcmd_RPC_RECEIVE_DATA* rd, void* src, void* dst, in
 	if ((mode & 1) == 0)
 	{
 		rd->hdr.tid = GetThreadId();
-		if (SifSendCmd(0x8000000C, packet, 0x40, 0, 0, 0) == 0)
+		if (sceSifSendCmd(0x8000000C, packet, 0x40, 0, 0, 0) == 0)
 			return -2;
 		SleepThread();
 	}
 	else
 	{ //async
 		rd->hdr.tid = -1;
-		if (SifSendCmd(0x8000000C, packet, 0x40, 0, 0, 0) == 0)
+		if (sceSifSendCmd(0x8000000C, packet, 0x40, 0, 0, 0) == 0)
 			return -2;
 	}
 	return 0;
@@ -456,11 +456,11 @@ void cmd80000009_BIND(RPC_PACKET_BIND* packet, struct tag_rpc_common* common)
 		epacket->buff = s->buff;
 		epacket->cbuff = s->cbuff;
 	}
-	iSifSendCmd(0x80000008, epacket, 0x40, 0, 0, 0);
+	isceSifSendCmd(0x80000008, epacket, 0x40, 0, 0, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////[0F]
-int SifBindRpc(struct sifcmd_RPC_CLIENT_DATA* client, unsigned int number, unsigned int mode)
+int sceSifBindRpc(struct sifcmd_RPC_CLIENT_DATA* client, unsigned int number, unsigned int mode)
 {
 	RPC_PACKET_BIND* packet;
 
@@ -480,14 +480,14 @@ int SifBindRpc(struct sifcmd_RPC_CLIENT_DATA* client, unsigned int number, unsig
 	if ((mode & 1) == 0)
 	{
 		client->hdr.tid = GetThreadId();
-		if (SifSendCmd(0x80000009, packet, 0x40, 0, 0, 0) == 0)
+		if (sceSifSendCmd(0x80000009, packet, 0x40, 0, 0, 0) == 0)
 			return -2;
 		SleepThread();
 	}
 	else
 	{ //async
 		client->hdr.tid = -1;
-		if (SifSendCmd(0x80000009, packet, 0x40, 0, 0, 0) == 0)
+		if (sceSifSendCmd(0x80000009, packet, 0x40, 0, 0, 0) == 0)
 			return -2;
 	}
 	return 0;
@@ -516,7 +516,7 @@ void cmd8000000A_CALL(RPC_PACKET_CALL* packet, struct tag_rpc_common* common)
 }
 
 ///////////////////////////////////////////////////////////////////////[10]
-int SifCallRpc(struct sifcmd_RPC_CLIENT_DATA* client, unsigned int fno, unsigned int mode, void* send, int ssize, void* receive, int rsize, void (*end_func)(void*), void* end_para)
+int sceSifCallRpc(struct sifcmd_RPC_CLIENT_DATA* client, unsigned int fno, unsigned int mode, void* send, int ssize, void* receive, int rsize, void (*end_func)(void*), void* end_para)
 {
 	RPC_PACKET_CALL* packet;
 
@@ -539,7 +539,7 @@ int SifCallRpc(struct sifcmd_RPC_CLIENT_DATA* client, unsigned int fno, unsigned
 	{
 		packet->rmode = (end_func != 0);
 		client->hdr.tid = -1;
-		if (SifSendCmd(0x8000000A, packet, 0x40, send, client->buff, ssize))
+		if (sceSifSendCmd(0x8000000A, packet, 0x40, send, client->buff, ssize))
 			return 0;
 		return -2;
 	}
@@ -547,7 +547,7 @@ int SifCallRpc(struct sifcmd_RPC_CLIENT_DATA* client, unsigned int fno, unsigned
 	{
 		packet->rmode = 1;
 		client->hdr.tid = GetThreadId();
-		if (SifSendCmd(0x8000000A, packet, 0x40, send, client->buff, ssize) == 0)
+		if (sceSifSendCmd(0x8000000A, packet, 0x40, send, client->buff, ssize) == 0)
 			return -2;
 		SleepThread();
 		return 0;
@@ -555,7 +555,7 @@ int SifCallRpc(struct sifcmd_RPC_CLIENT_DATA* client, unsigned int fno, unsigned
 }
 
 ///////////////////////////////////////////////////////////////////////[12]
-int SifCheckStatRpc(struct sifcmd_RPC_HEADER* rd)
+int sceSifCheckStatRpc(struct sifcmd_RPC_HEADER* rd)
 {
 	RPC_PACKET* packet = (RPC_PACKET*)rd->pkt_addr;
 	return (rd->pkt_addr &&
@@ -564,7 +564,7 @@ int SifCheckStatRpc(struct sifcmd_RPC_HEADER* rd)
 }
 
 ///////////////////////////////////////////////////////////////////////[13]
-void SifSetRpcQueue(struct sifcmd_RPC_DATA_QUEUE* qd, int key)
+void sceSifSetRpcQueue(struct sifcmd_RPC_DATA_QUEUE* qd, int key)
 {
 	int x;
 	register struct sifcmd_RPC_DATA_QUEUE *q, *i;
@@ -587,7 +587,7 @@ void SifSetRpcQueue(struct sifcmd_RPC_DATA_QUEUE* qd, int key)
 }
 
 ///////////////////////////////////////////////////////////////////////[11]
-void SifRegisterRpc(struct sifcmd_RPC_SERVER_DATA* sd, u32 command,
+void sceSifRegisterRpc(struct sifcmd_RPC_SERVER_DATA* sd, u32 command,
 	rpch_func func, void* buff,
 	rpch_func cfunc, void* cbuff,
 	struct sifcmd_RPC_DATA_QUEUE* qd)
@@ -617,7 +617,7 @@ void SifRegisterRpc(struct sifcmd_RPC_SERVER_DATA* sd, u32 command,
 }
 
 ///////////////////////////////////////////////////////////////////////[18]
-struct sifcmd_RPC_SERVER_DATA* SifRemoveRpc(struct sifcmd_RPC_SERVER_DATA* sd, struct sifcmd_RPC_DATA_QUEUE* qd)
+struct sifcmd_RPC_SERVER_DATA* sceSifRemoveRpc(struct sifcmd_RPC_SERVER_DATA* sd, struct sifcmd_RPC_DATA_QUEUE* qd)
 {
 	int x;
 	register struct sifcmd_RPC_SERVER_DATA* s;
@@ -638,7 +638,7 @@ struct sifcmd_RPC_SERVER_DATA* SifRemoveRpc(struct sifcmd_RPC_SERVER_DATA* sd, s
 }
 
 ///////////////////////////////////////////////////////////////////////[19]
-struct sifcmd_RPC_DATA_QUEUE* SifRemoveRpcQueue(struct sifcmd_RPC_DATA_QUEUE* qd)
+struct sifcmd_RPC_DATA_QUEUE* sceSifRemoveRpcQueue(struct sifcmd_RPC_DATA_QUEUE* qd)
 {
 	int x;
 	register struct sifcmd_RPC_DATA_QUEUE* q;
@@ -666,7 +666,7 @@ struct sifcmd_RPC_DATA_QUEUE* SifRemoveRpcQueue(struct sifcmd_RPC_DATA_QUEUE* qd
 }
 
 ///////////////////////////////////////////////////////////////////////[14]
-struct sifcmd_RPC_SERVER_DATA* SifGetNextRequest(struct sifcmd_RPC_DATA_QUEUE* qd)
+struct sifcmd_RPC_SERVER_DATA* sceSifGetNextRequest(struct sifcmd_RPC_DATA_QUEUE* qd)
 {
 	int x;
 	register struct sifcmd_RPC_SERVER_DATA* s;
@@ -686,7 +686,7 @@ struct sifcmd_RPC_SERVER_DATA* SifGetNextRequest(struct sifcmd_RPC_DATA_QUEUE* q
 }
 
 ///////////////////////////////////////////////////////////////////////[15]
-void SifExecRequest(struct sifcmd_RPC_SERVER_DATA* sd)
+void sceSifExecRequest(struct sifcmd_RPC_SERVER_DATA* sd)
 {
 	int x;
 	register int size, id, count, i;
@@ -708,7 +708,7 @@ void SifExecRequest(struct sifcmd_RPC_SERVER_DATA* sd)
 	count = 0;
 	if (sd->rmode)
 	{
-		while (SifSendCmd(0x80000008, epacket, 0x40, buff, sd->receive, size) == 0)
+		while (sceSifSendCmd(0x80000008, epacket, 0x40, buff, sd->receive, size) == 0)
 			;
 		return;
 	}
@@ -732,7 +732,7 @@ void SifExecRequest(struct sifcmd_RPC_SERVER_DATA* sd)
 		do
 		{
 			CpuSuspendIntr(&x);
-			id = SifSetDma(dma, count);
+			id = sceSifSetDma(dma, count);
 			CpuResumeIntr(x);
 			if (id)
 				break;
@@ -745,27 +745,27 @@ void SifExecRequest(struct sifcmd_RPC_SERVER_DATA* sd)
 }
 
 ///////////////////////////////////////////////////////////////////////[16]
-void SifRpcLoop(struct sifcmd_RPC_DATA_QUEUE* qd)
+void sceSifRpcLoop(struct sifcmd_RPC_DATA_QUEUE* qd)
 {
 	register struct sifcmd_RPC_SERVER_DATA* s;
 
 	do
 	{
-		s = SifGetNextRequest(qd);
+		s = sceSifGetNextRequest(qd);
 		if (s != 0)
-			SifExecRequest(s);
+			sceSifExecRequest(s);
 		else
 			SleepThread();
 	} while (1);
 }
 
 ///////////////////////////////////////////////////////////////////////[0E]
-void SifInitRpc(int mode)
+void sceSifInitRpc(int mode)
 {
 	int x;
 	_dprintf("%s\n", __FUNCTION__);
 
-	SifInitCmd();
+	sceSifInitCmd();
 	CpuSuspendIntr(&x);
 
 	if (sifInitRpc)
@@ -784,16 +784,16 @@ void SifInitRpc(int mode)
 		rpc_common.base = 0;
 		rpc_common.pid = 1;
 
-		SifAddCmdHandler(0x80000008, (cmdh_func)cmd80000008_END, &rpc_common);
-		SifAddCmdHandler(0x80000009, (cmdh_func)cmd80000009_BIND, &rpc_common);
-		SifAddCmdHandler(0x8000000A, (cmdh_func)cmd8000000A_CALL, &rpc_common);
-		SifAddCmdHandler(0x8000000C, (cmdh_func)cmd8000000C_RDATA, &rpc_common);
+		sceSifAddCmdHandler(0x80000008, (cmdh_func)cmd80000008_END, &rpc_common);
+		sceSifAddCmdHandler(0x80000009, (cmdh_func)cmd80000009_BIND, &rpc_common);
+		sceSifAddCmdHandler(0x8000000A, (cmdh_func)cmd8000000A_CALL, &rpc_common);
+		sceSifAddCmdHandler(0x8000000C, (cmdh_func)cmd8000000C_RDATA, &rpc_common);
 
 		CpuResumeIntr(x);
 
 		((SifCmdSRData*)bufx)->rno = 0;
 		((SifCmdSRData*)bufx)->value = 1;
-		SifSendCmd(0x80000001, (void*)bufx, sizeof(SifCmdSRData), 0, 0, 0);
+		sceSifSendCmd(0x80000001, (void*)bufx, sizeof(SifCmdSRData), 0, 0, 0);
 	}
 	WaitEventFlag(GetSystemStatusFlag(), 0x800, 0, 0);
 }
@@ -810,30 +810,30 @@ struct export sifcmd_stub = {
 	(func)_retonly,
 	(func)SifDeinitCmd,
 	(func)_retonly,
-	(func)SifInitCmd,
-	(func)SifExitCmd,
-	(func)SifGetSreg,
-	(func)SifSetSreg,
-	(func)SifSetCmdBuffer,
-	(func)SifSetSysCmdBuffer,
-	(func)SifAddCmdHandler,
-	(func)SifRemoveCmdHandler,
-	(func)SifSendCmd,
-	(func)iSifSendCmd,
-	(func)SifInitRpc,
-	(func)SifBindRpc,
-	(func)SifCallRpc,
-	(func)SifRegisterRpc,
-	(func)SifCheckStatRpc,
-	(func)SifSetRpcQueue,
-	(func)SifGetNextRequest,
-	(func)SifExecRequest,
-	(func)SifRpcLoop,
-	(func)SifGetOtherData,
-	(func)SifRemoveRpc,
-	(func)SifRemoveRpcQueue,
-	(func)SifSet1CB,
-	(func)SifReset1CB,
+	(func)sceSifInitCmd,
+	(func)sceSifExitCmd,
+	(func)sceSifGetSreg,
+	(func)sceSifSetSreg,
+	(func)sceSifSetCmdBuffer,
+	(func)sceSifSetSysCmdBuffer,
+	(func)sceSifAddCmdHandler,
+	(func)sceSifRemoveCmdHandler,
+	(func)sceSifSendCmd,
+	(func)isceSifSendCmd,
+	(func)sceSifInitRpc,
+	(func)sceSifBindRpc,
+	(func)sceSifCallRpc,
+	(func)sceSifRegisterRpc,
+	(func)sceSifCheckStatRpc,
+	(func)sceSifSetRpcQueue,
+	(func)sceSifGetNextRequest,
+	(func)sceSifExecRequest,
+	(func)sceSifRpcLoop,
+	(func)sceSifGetOtherData,
+	(func)sceSifRemoveRpc,
+	(func)sceSifRemoveRpcQueue,
+	(func)sceSifSetSif1CB,
+	(func)sceSifClearSif1CB,
 	(func)_retonly,
 	(func)_retonly,
 	(func)_retonly,
@@ -863,8 +863,8 @@ int _start()
 		}
 	}
 
-	if (SifCheckInit() == 0)
-		SifInit();
+	if (sceSifCheckInit() == 0)
+		sceSifInit();
 
 	if (RegisterLibraryEntries(&sifcmd_stub))
 		return 1;
@@ -904,7 +904,7 @@ int _start()
 	RegisterIntrHandler(INT_DMA10, 1, SIF1_handler, (void*)&cmd_common);
 	EnableIntr(INT_DMA10 | IMODE_DMA_IQE);
 
-	SifSetIOPrcvaddr((u32)sif1_rcvBuffer);
+	sceSifSetSubAddr((u32)sif1_rcvBuffer);
 
 	return 0;
 }

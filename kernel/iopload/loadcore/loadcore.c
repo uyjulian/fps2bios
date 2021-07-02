@@ -38,7 +38,7 @@ u32 bm_end;
 	__printf("loadcore:%d: " fmt, __LINE__, ##args)
 
 void retonly();
-struct tag_LC_internals* GetLibraryEntryTable();
+struct tag_LC_internals* GetLoadcoreInternalData();
 void FlushIcache();
 void FlushDcache();
 int RegisterLibraryEntries(struct export* es);
@@ -53,7 +53,7 @@ int SetNonAutoLinkFlag(struct export* e);
 int UnsetNonAutoLinkFlag(struct export* e);
 void _LinkModule(imageInfo* ii);
 void _UnlinkModule(imageInfo* ii);
-int _RegisterBootupCBFunc(int (*function)(int*, int), int priority, int* result);
+int RegisterBootCallback(int (*function)(int*, int), int priority, int* result);
 void _SetCacheCtrl(u32 val);
 int _ReadModuleHeader(void* image, fileInfo* result);
 int _LoadModule(void* image, fileInfo* fi);
@@ -68,7 +68,7 @@ struct export loadcore_stub __attribute__((section(".text"))) = {
 	(func)_start, // entrypoint
 	(func)retonly,
 	(func)retonly,
-	(func)GetLibraryEntryTable,
+	(func)GetLoadcoreInternalData,
 	(func)FlushIcache,
 	(func)FlushDcache,
 	(func)RegisterLibraryEntries,
@@ -85,7 +85,7 @@ struct export loadcore_stub __attribute__((section(".text"))) = {
 	(func)_UnlinkModule,
 	(func)retonly,
 	(func)retonly,
-	(func)_RegisterBootupCBFunc,
+	(func)RegisterBootCallback,
 	(func)_SetCacheCtrl,
 	(func)_ReadModuleHeader,
 	(func)_LoadModule,
@@ -358,7 +358,7 @@ int UnsetNonAutoLinkFlag(struct export* e)
 }
 
 ///////////////////////////////////////////////////////////////////////
-int _RegisterBootupCBFunc(int (*function)(int*, int), int priority, int* result)
+int RegisterBootCallback(int (*function)(int*, int), int priority, int* result)
 {
 	int x;
 	register int r;
@@ -577,7 +577,7 @@ int QueryLibraryEntryTable(struct export* e)
 }
 
 ///////////////////////////////////////////////////////////////////////
-struct tag_LC_internals* GetLibraryEntryTable()
+struct tag_LC_internals* GetLoadcoreInternalData()
 {
 	return &lc_internals;
 }
@@ -1132,7 +1132,7 @@ void loadcore_start(BOOT_PARAMS* pInitParams)
 				{
 					_LinkModule((imageInfo*)(fi.p1_vaddr - 0x30));
 					if (s1 & ~3)
-						_RegisterBootupCBFunc((int (*)(int*, int))(s1 & ~3), BOOTUPCB_NORMAL, 0);
+						RegisterBootCallback((int (*)(int*, int))(s1 & ~3), BOOTUPCB_NORMAL, 0);
 				}
 				else
 				{

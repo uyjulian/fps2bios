@@ -23,8 +23,8 @@ loadcore_stub:
 	.ascii	"loadcore"
 	.align	2
 
-	.globl	GetLibraryEntryTable		# 0x03
-GetLibraryEntryTable:
+	.globl	GetLoadcoreInternalData		# 0x03
+GetLoadcoreInternalData:
 	j	$31
 	li	$0, 3
 

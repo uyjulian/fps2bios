@@ -87,7 +87,7 @@ struct export sysmem_stub __attribute__((section(".text"))) = {
 	(func)sysmem_retonly,
 	(func)sysmem_retonly,
 	(func)Kprintf,
-	(func)sysmem_call15_set_Kprintf,
+	(func)KprintfSet,
 	0};
 
 struct allocTABLE* alloclist;
@@ -584,7 +584,7 @@ char* Kprintf(const char* format, ...)
 }
 
 ///////////////////////////////////////////////////////////////////////[OK]
-void sysmem_call15_set_Kprintf(char* (*newKprintf)(unsigned int, const char*, ...), unsigned int newunk)
+void KprintfSet(char* (*newKprintf)(unsigned int, const char*, ...), unsigned int newunk)
 {
 	if (_Kprintf && newKprintf)
 		newKprintf(newunk, _Kprintf(0));

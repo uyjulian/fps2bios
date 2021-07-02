@@ -507,7 +507,7 @@ int _getBF801558(unsigned int ch)
 }
 
 ///////////////////////////////////////////////////////////////////////
-void dmacSetD_TADR(unsigned int ch, int value)
+void dmac_ch_set_tadr(unsigned int ch, int value)
 {
 	if (ch == DMAch_SPU)
 		*(int*)0xBF8010CC = value;
@@ -516,7 +516,7 @@ void dmacSetD_TADR(unsigned int ch, int value)
 }
 
 ///////////////////////////////////////////////////////////////////////
-int dmacGetD_TADR(unsigned int ch)
+int dmac_ch_get_tadr(unsigned int ch)
 {
 	if (ch == DMAch_SPU)
 		return *(int*)0xBF8010CC;
@@ -549,61 +549,61 @@ int dmacGet_4_9_A(unsigned int ch)
 }
 
 ///////////////////////////////////////////////////////////////////////
-void dmacSetDPCR(int value)
+void dmac_set_dpcr(int value)
 {
 	*(int*)0xBF8010F0 = value;
 }
 
 ///////////////////////////////////////////////////////////////////////
-int dmacGetDPCR()
+int dmac_get_dpcr()
 {
 	return *(int*)0xBF8010F0;
 }
 
 ///////////////////////////////////////////////////////////////////////
-void dmacSetDPCR2(int value)
+void dmac_set_dpcr2(int value)
 {
 	*(int*)0xBF801570 = value;
 }
 
 ///////////////////////////////////////////////////////////////////////
-int dmacGetDPCR2()
+int dmac_get_dpcr2()
 {
 	return *(int*)0xBF801570;
 }
 
 ///////////////////////////////////////////////////////////////////////
-void dmacSetDPCR3(int value)
+void dmac_set_dpcr3(int value)
 {
 	*(int*)0xBF8015F0 = value;
 }
 
 ///////////////////////////////////////////////////////////////////////
-int dmacGetDPCR3()
+int dmac_get_dpcr3()
 {
 	return *(int*)0xBF8015F0;
 }
 
 ///////////////////////////////////////////////////////////////////////
-void dmacSetDICR(int value)
+void dmac_set_dicr(int value)
 {
 	*(int*)0xBF8010F4 = value;
 }
 
 ///////////////////////////////////////////////////////////////////////
-int dmacGetDICR()
+int dmac_get_dicr()
 {
 	return *(int*)0xBF8010F4;
 }
 
 ///////////////////////////////////////////////////////////////////////
-void dmacSetDICR2(int value)
+void dmac_set_dicr2(int value)
 {
 	*(int*)0xBF801574 = value;
 }
 
 ///////////////////////////////////////////////////////////////////////
-int dmacGetDICR2()
+int dmac_get_dicr2()
 {
 	return *(int*)0xBF801574;
 }
@@ -669,14 +669,14 @@ func getD_CHCR[] = {
 	(func)_getBF801538, (func)_getBF801548, (func)_getBF801558, 0};
 
 ///////////////////////////////////////////////////////////////////////
-void dmacSetD_MADR(unsigned int ch, int value)
+void dmac_ch_set_madr(unsigned int ch, int value)
 {
 	if (ch < 13)
 		setD_MADR[ch](ch, value); //function call
 }
 
 ///////////////////////////////////////////////////////////////////////
-int dmacGetD_MADR(unsigned int ch)
+int dmac_ch_get_madr(unsigned int ch)
 {
 	if (ch < 13)
 		return getD_MADR[ch](ch); //function call
@@ -684,14 +684,14 @@ int dmacGetD_MADR(unsigned int ch)
 }
 
 ///////////////////////////////////////////////////////////////////////
-void dmacSetD_BCR(unsigned int ch, int value)
+void dmac_ch_set_bcr(unsigned int ch, int value)
 {
 	if (ch < 13)
 		setD_BCR[ch](ch, value); //function call
 }
 
 ///////////////////////////////////////////////////////////////////////
-int dmacGetD_BCR(unsigned int ch)
+int dmac_ch_get_bcr(unsigned int ch)
 {
 	if (ch < 13)
 		return getD_BCR[ch](ch); //function call
@@ -699,14 +699,14 @@ int dmacGetD_BCR(unsigned int ch)
 }
 
 ///////////////////////////////////////////////////////////////////////
-void dmacSetD_CHCR(unsigned int ch, int value)
+void dmac_ch_set_chcr(unsigned int ch, int value)
 {
 	if (ch < 13)
 		setD_CHCR[ch](ch, value); //function call
 }
 
 ///////////////////////////////////////////////////////////////////////
-int dmacGetD_CHCR(unsigned int ch)
+int dmac_ch_get_chcr(unsigned int ch)
 {
 	if (ch < 13)
 		return getD_CHCR[ch](ch); //function call
@@ -726,10 +726,10 @@ int dmacDeinit()
 	dmacSetBF801578(0);
 	for (ch = 0; ch < 13; ch++)
 	{
-		value = dmacGetD_CHCR(ch);
+		value = dmac_ch_get_chcr(ch);
 		if (value & DMAf_TR) //sysmem
 			Kprintf("WARNING:DMA %dch has been continued until shutdown\n", ch);
-		dmacSetD_CHCR(ch, value & 0xFEFFFFFF);
+		dmac_ch_set_chcr(ch, value & 0xFEFFFFFF);
 	}
 
 	CpuResumeIntr(x); //intrman
@@ -737,13 +737,13 @@ int dmacDeinit()
 }
 
 ///////////////////////////////////////////////////////////////////////
-int dmacSetDMA(int ch, int address, int size, int count, int dir)
+int dmac_request(int ch, int address, int size, int count, int dir)
 {
 	if (ch < 13 && ch != DMAch_GPUotc)
 	{
-		dmacSetD_MADR(ch, 0x00FFFFFF & address);
-		dmacSetD_BCR(ch, (count << 16) | (size & 0xFFFF));
-		dmacSetD_CHCR(ch, (dir & DMAf_DR) | DMAf_CO |
+		dmac_ch_set_madr(ch, 0x00FFFFFF & address);
+		dmac_ch_set_bcr(ch, (count << 16) | (size & 0xFFFF));
+		dmac_ch_set_chcr(ch, (dir & DMAf_DR) | DMAf_CO |
 							  (dir == 0 ? DMAf_30 : 0));
 		return 1;
 	}
@@ -755,9 +755,9 @@ int dmacSetDMA_chainedSPU_SIF0(int ch, int size, int tadr)
 {
 	if (ch != DMAch_SPU && ch != DMAch_SIF0)
 		return 0;
-	dmacSetD_BCR(ch, size & 0x0000FFFF);
-	dmacSetD_CHCR(ch, DMAf_LI | DMAf_CO | DMAf_DR); //0x601
-	dmacSetD_TADR(ch, tadr & 0x00FFFFFF);
+	dmac_ch_set_bcr(ch, size & 0x0000FFFF);
+	dmac_ch_set_chcr(ch, DMAf_LI | DMAf_CO | DMAf_DR); //0x601
+	dmac_ch_set_tadr(ch, tadr & 0x00FFFFFF);
 	return 1;
 }
 
@@ -766,9 +766,9 @@ int dmacSetDMA_SIF0(int ch, int size, int tadr)
 {
 	if (ch != DMAch_SIF0)
 		return 0;
-	dmacSetD_BCR(DMAch_SIF0, size & 0x0000FFFF);
-	dmacSetD_CHCR(DMAch_SIF0, DMAf_LI | DMAf_CO | DMAf_08 | DMAf_DR); //0x701
-	dmacSetD_TADR(DMAch_SIF0, tadr & 0x00FFFFFF);
+	dmac_ch_set_bcr(DMAch_SIF0, size & 0x0000FFFF);
+	dmac_ch_set_chcr(DMAch_SIF0, DMAf_LI | DMAf_CO | DMAf_08 | DMAf_DR); //0x701
+	dmac_ch_set_tadr(DMAch_SIF0, tadr & 0x00FFFFFF);
 	return 1;
 }
 
@@ -777,21 +777,21 @@ int dmacSetDMA_SIF1(int ch, int size)
 {
 	if (ch != DMAch_SIF1)
 		return 0;
-	dmacSetD_BCR(DMAch_SIF1, size & 0x0000FFFF);
-	dmacSetD_CHCR(DMAch_SIF1, DMAf_30 | DMAf_CO | DMAf_08); //0x40000300
+	dmac_ch_set_bcr(DMAch_SIF1, size & 0x0000FFFF);
+	dmac_ch_set_chcr(DMAch_SIF1, DMAf_30 | DMAf_CO | DMAf_08); //0x40000300
 	return 1;
 }
 
 ///////////////////////////////////////////////////////////////////////
-void dmacStartTransfer(int ch)
+void dmac_transfer(int ch)
 {
 	if (ch < 15)
-		dmacSetD_CHCR(ch, DMAf_TR | dmacGetD_CHCR(ch));
+		dmac_ch_set_chcr(ch, DMAf_TR | dmac_ch_get_chcr(ch));
 }
 
 ///////////////////////////////////////////////////////////////////////
 // set 3-bit value of channel
-void dmacSetVal(int ch, int value)
+void dmac_ch_set_dpcr(int ch, int value)
 {
 	int x;
 	CpuSuspendIntr(&x); //intrman
@@ -799,93 +799,93 @@ void dmacSetVal(int ch, int value)
 	switch (ch)
 	{
 		case DMAch_MDECin:
-			dmacSetDPCR(
-				(dmacGetDPCR() & 0xFFFFFFF8) |
+			dmac_set_dpcr(
+				(dmac_get_dpcr() & 0xFFFFFFF8) |
 				(value & 7));
 			break;
 		case DMAch_MDECout:
-			dmacSetDPCR(
-				(dmacGetDPCR() & 0xFFFFFF8F) |
+			dmac_set_dpcr(
+				(dmac_get_dpcr() & 0xFFFFFF8F) |
 				((value & 7) << 4));
 			break;
 		case DMAch_GPU:
-			dmacSetDPCR(
-				(dmacGetDPCR() & 0xFFFFF8FF) |
+			dmac_set_dpcr(
+				(dmac_get_dpcr() & 0xFFFFF8FF) |
 				((value & 7) << 8));
 			break;
 		case DMAch_CD:
-			dmacSetDPCR(
-				(dmacGetDPCR() & 0xFFFF8FFF) |
+			dmac_set_dpcr(
+				(dmac_get_dpcr() & 0xFFFF8FFF) |
 				((value & 7) << 12));
 			break;
 		case DMAch_SPU:
-			dmacSetDPCR(
-				(dmacGetDPCR() & 0xFFF8FFFF) |
+			dmac_set_dpcr(
+				(dmac_get_dpcr() & 0xFFF8FFFF) |
 				((value & 7) << 16));
 			break;
 		case DMAch_PIO:
-			dmacSetDPCR(
-				(dmacGetDPCR() & 0xFF8FFFFF) |
+			dmac_set_dpcr(
+				(dmac_get_dpcr() & 0xFF8FFFFF) |
 				((value & 7) << 20));
 			break;
 		case DMAch_GPUotc:
-			dmacSetDPCR(
-				(dmacGetDPCR() & 0xF8FFFFFF) |
+			dmac_set_dpcr(
+				(dmac_get_dpcr() & 0xF8FFFFFF) |
 				((value & 7) << 24));
 			break;
 		case DMAch_SPU2:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() & 0xFFFFFFF8) |
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() & 0xFFFFFFF8) |
 				(value & 7));
 			break;
 		case DMAch_8:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() & 0xFFFFFF8F) |
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() & 0xFFFFFF8F) |
 				((value & 7) << 4));
 			break;
 		case DMAch_SIF0:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() & 0xFFFFF8FF) |
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() & 0xFFFFF8FF) |
 				((value & 7) << 8));
 			break;
 		case DMAch_SIF1:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() & 0xFFFF8FFF) |
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() & 0xFFFF8FFF) |
 				((value & 7) << 12));
 			break;
 		case DMAch_SIO2in:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() & 0xFFF8FFFF) |
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() & 0xFFF8FFFF) |
 				((value & 7) << 16));
 			break;
 		case DMAch_SIO2out:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() & 0xFF8FFFFF) |
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() & 0xFF8FFFFF) |
 				((value & 7) << 20));
 			break;
 		case DMAch_13:
-			dmacSetDPCR3(
-				(dmacGetDPCR3() & 0xFFFFFFF8) |
+			dmac_set_dpcr3(
+				(dmac_get_dpcr3() & 0xFFFFFFF8) |
 				(value & 7));
 			break;
 		case DMAch_14:
-			dmacSetDPCR3(
-				(dmacGetDPCR3() & 0xFFFFFF8F) |
+			dmac_set_dpcr3(
+				(dmac_get_dpcr3() & 0xFFFFFF8F) |
 				((value & 7) << 4));
 			break;
 		case DMAch_15:
-			dmacSetDPCR3(
-				(dmacGetDPCR3() & 0xFFFFF8FF) |
+			dmac_set_dpcr3(
+				(dmac_get_dpcr3() & 0xFFFFF8FF) |
 				((value & 7) << 8));
 			break;
 		case DMAch_67:
-			dmacSetDPCR(
-				(dmacGetDPCR() & 0x8FFFFFFF) |
+			dmac_set_dpcr(
+				(dmac_get_dpcr() & 0x8FFFFFFF) |
 				((value & 7) << 28));
 			break;
 		case DMAch_85:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() & 0xF8FFFFFF) |
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() & 0xF8FFFFFF) |
 				((value & 7) << 24));
 			break;
 	}
@@ -895,7 +895,7 @@ void dmacSetVal(int ch, int value)
 
 ///////////////////////////////////////////////////////////////////////
 // set 4th bit of channel
-void dmacEnableDMAch(int ch)
+void dmac_enable(int ch)
 {
 	int x;
 	CpuSuspendIntr(&x); //intrman
@@ -903,72 +903,72 @@ void dmacEnableDMAch(int ch)
 	switch (ch)
 	{
 		case DMAch_MDECin:
-			dmacSetDPCR(
-				(dmacGetDPCR() | 0x00000008));
+			dmac_set_dpcr(
+				(dmac_get_dpcr() | 0x00000008));
 			break;
 		case DMAch_MDECout:
-			dmacSetDPCR(
-				(dmacGetDPCR() | 0x00000080));
+			dmac_set_dpcr(
+				(dmac_get_dpcr() | 0x00000080));
 			break;
 		case DMAch_GPU:
-			dmacSetDPCR(
-				(dmacGetDPCR() | 0x00000800));
+			dmac_set_dpcr(
+				(dmac_get_dpcr() | 0x00000800));
 			break;
 		case DMAch_CD:
-			dmacSetDPCR(
-				(dmacGetDPCR() | 0x00008000));
+			dmac_set_dpcr(
+				(dmac_get_dpcr() | 0x00008000));
 			break;
 		case DMAch_SPU:
-			dmacSetDPCR(
-				(dmacGetDPCR() | 0x00080000));
+			dmac_set_dpcr(
+				(dmac_get_dpcr() | 0x00080000));
 			break;
 		case DMAch_PIO:
-			dmacSetDPCR(
-				(dmacGetDPCR() | 0x00800000));
+			dmac_set_dpcr(
+				(dmac_get_dpcr() | 0x00800000));
 			break;
 		case DMAch_GPUotc:
-			dmacSetDPCR(
-				(dmacGetDPCR() | 0x08000000));
+			dmac_set_dpcr(
+				(dmac_get_dpcr() | 0x08000000));
 			break;
 		case DMAch_SPU2:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() | 0x00000008));
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() | 0x00000008));
 			break;
 		case DMAch_8:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() | 0x00000080));
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() | 0x00000080));
 			break;
 		case DMAch_SIF0:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() | 0x00000800));
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() | 0x00000800));
 			break;
 		case DMAch_SIF1:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() | 0x00008000));
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() | 0x00008000));
 			break;
 		case DMAch_SIO2in:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() | 0x00080000));
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() | 0x00080000));
 			break;
 		case DMAch_SIO2out:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() | 0x00800000));
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() | 0x00800000));
 			break;
 		case DMAch_13:
-			dmacSetDPCR3(
-				(dmacGetDPCR3() | 0x00000008));
+			dmac_set_dpcr3(
+				(dmac_get_dpcr3() | 0x00000008));
 			break;
 		case DMAch_14:
-			dmacSetDPCR3(
-				(dmacGetDPCR3() | 0x00000080));
+			dmac_set_dpcr3(
+				(dmac_get_dpcr3() | 0x00000080));
 			break;
 		case DMAch_15:
-			dmacSetDPCR3(
-				(dmacGetDPCR3() | 0x00000800));
+			dmac_set_dpcr3(
+				(dmac_get_dpcr3() | 0x00000800));
 			break;
 		case DMAch_85:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() | 0x08000000));
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() | 0x08000000));
 			break;
 	}
 
@@ -977,7 +977,7 @@ void dmacEnableDMAch(int ch)
 
 ///////////////////////////////////////////////////////////////////////
 // reset 4th bit of channel
-void dmacDisableDMAch(int ch)
+void dmac_disable(int ch)
 {
 	int x;
 	CpuSuspendIntr(&x); //intrman
@@ -985,72 +985,72 @@ void dmacDisableDMAch(int ch)
 	switch (ch)
 	{
 		case DMAch_MDECin:
-			dmacSetDPCR(
-				(dmacGetDPCR() & 0xFFFFFFF7));
+			dmac_set_dpcr(
+				(dmac_get_dpcr() & 0xFFFFFFF7));
 			break;
 		case DMAch_MDECout:
-			dmacSetDPCR(
-				(dmacGetDPCR() & 0xFFFFFF7F));
+			dmac_set_dpcr(
+				(dmac_get_dpcr() & 0xFFFFFF7F));
 			break;
 		case DMAch_GPU:
-			dmacSetDPCR(
-				(dmacGetDPCR() & 0xFFFFF7FF));
+			dmac_set_dpcr(
+				(dmac_get_dpcr() & 0xFFFFF7FF));
 			break;
 		case DMAch_CD:
-			dmacSetDPCR(
-				(dmacGetDPCR() & 0xFFFF7FFF));
+			dmac_set_dpcr(
+				(dmac_get_dpcr() & 0xFFFF7FFF));
 			break;
 		case DMAch_SPU:
-			dmacSetDPCR(
-				(dmacGetDPCR() & 0xFFF7FFFF));
+			dmac_set_dpcr(
+				(dmac_get_dpcr() & 0xFFF7FFFF));
 			break;
 		case DMAch_PIO:
-			dmacSetDPCR(
-				(dmacGetDPCR() & 0xFF7FFFFF));
+			dmac_set_dpcr(
+				(dmac_get_dpcr() & 0xFF7FFFFF));
 			break;
 		case DMAch_GPUotc:
-			dmacSetDPCR(
-				(dmacGetDPCR() & 0xF7FFFFFF));
+			dmac_set_dpcr(
+				(dmac_get_dpcr() & 0xF7FFFFFF));
 			break;
 		case DMAch_SPU2:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() & 0xFFFFFFF7));
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() & 0xFFFFFFF7));
 			break;
 		case DMAch_8:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() & 0xFFFFFF7F));
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() & 0xFFFFFF7F));
 			break;
 		case DMAch_SIF0:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() & 0xFFFFF7FF));
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() & 0xFFFFF7FF));
 			break;
 		case DMAch_SIF1:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() & 0xFFFF7FFF));
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() & 0xFFFF7FFF));
 			break;
 		case DMAch_SIO2in:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() & 0xFFF7FFFF));
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() & 0xFFF7FFFF));
 			break;
 		case DMAch_SIO2out:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() & 0xFF7FFFFF));
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() & 0xFF7FFFFF));
 			break;
 		case DMAch_13:
-			dmacSetDPCR3(
-				(dmacGetDPCR3() & 0xFFFFFFF7));
+			dmac_set_dpcr3(
+				(dmac_get_dpcr3() & 0xFFFFFFF7));
 			break;
 		case DMAch_14:
-			dmacSetDPCR3(
-				(dmacGetDPCR3() & 0xFFFFFF7F));
+			dmac_set_dpcr3(
+				(dmac_get_dpcr3() & 0xFFFFFF7F));
 			break;
 		case DMAch_15:
-			dmacSetDPCR3(
-				(dmacGetDPCR3() & 0xFFFFF7FF));
+			dmac_set_dpcr3(
+				(dmac_get_dpcr3() & 0xFFFFF7FF));
 			break;
 		case DMAch_85:
-			dmacSetDPCR2(
-				(dmacGetDPCR2() & 0xF7FFFFFF));
+			dmac_set_dpcr2(
+				(dmac_get_dpcr2() & 0xF7FFFFFF));
 			break;
 	}
 
@@ -1070,38 +1070,38 @@ struct export dmacman_stub = {
 	(func)_retonly,
 	(func)dmacDeinit,
 	(func)_retonly,
-	(func)dmacSetD_MADR,
-	(func)dmacGetD_MADR,
-	(func)dmacSetD_BCR,
-	(func)dmacGetD_BCR,
-	(func)dmacSetD_CHCR,
-	(func)dmacGetD_CHCR,
-	(func)dmacSetD_TADR,
-	(func)dmacGetD_TADR,
+	(func)dmac_ch_set_madr,
+	(func)dmac_ch_get_madr,
+	(func)dmac_ch_set_bcr,
+	(func)dmac_ch_get_bcr,
+	(func)dmac_ch_set_chcr,
+	(func)dmac_ch_get_chcr,
+	(func)dmac_ch_set_tadr,
+	(func)dmac_ch_get_tadr,
 	(func)dmacSet_4_9_A,
 	(func)dmacGet_4_9_A,
-	(func)dmacSetDPCR,
-	(func)dmacGetDPCR,
-	(func)dmacSetDPCR2,
-	(func)dmacGetDPCR2,
-	(func)dmacSetDPCR3,
-	(func)dmacGetDPCR3,
-	(func)dmacSetDICR,
-	(func)dmacGetDICR,
-	(func)dmacSetDICR2,
-	(func)dmacGetDICR2,
+	(func)dmac_set_dpcr,
+	(func)dmac_get_dpcr,
+	(func)dmac_set_dpcr2,
+	(func)dmac_get_dpcr2,
+	(func)dmac_set_dpcr3,
+	(func)dmac_get_dpcr3,
+	(func)dmac_set_dicr,
+	(func)dmac_get_dicr,
+	(func)dmac_set_dicr2,
+	(func)dmac_get_dicr2,
 	(func)dmacSetBF80157C,
 	(func)dmacGetBF80157C,
 	(func)dmacSetBF801578,
 	(func)dmacGetBF801578,
-	(func)dmacSetDMA,
+	(func)dmac_request,
 	(func)dmacSetDMA_chainedSPU_SIF0,
 	(func)dmacSetDMA_SIF0,
 	(func)dmacSetDMA_SIF1,
-	(func)dmacStartTransfer,
-	(func)dmacSetVal,
-	(func)dmacEnableDMAch,
-	(func)dmacDisableDMAch,
+	(func)dmac_transfer,
+	(func)dmac_ch_set_dpcr,
+	(func)dmac_enable,
+	(func)dmac_disable,
 	0};
 
 //////////////////////////////entrypoint///////////////////////////////
@@ -1115,17 +1115,17 @@ int _start(int argc, char* argv[])
 
 	CpuSuspendIntr(&x); //intrman
 
-	dmacSetDPCR(0x07777777);
-	dmacSetDPCR2(0x07777777);
-	dmacSetDPCR3(0x00000777);
+	dmac_set_dpcr(0x07777777);
+	dmac_set_dpcr2(0x07777777);
+	dmac_set_dpcr3(0x00000777);
 	for (ch = 0; ch < 13; ch++)
 	{
-		dmacSetD_MADR(ch, 0);
-		dmacSetD_BCR(ch, 0);
-		dmacSetD_CHCR(ch, 0);
+		dmac_ch_set_madr(ch, 0);
+		dmac_ch_set_bcr(ch, 0);
+		dmac_ch_set_chcr(ch, 0);
 	}
-	dmacSetD_TADR(DMAch_SPU, 0);
-	dmacSetD_TADR(DMAch_SIF0, 0);
+	dmac_ch_set_tadr(DMAch_SPU, 0);
+	dmac_ch_set_tadr(DMAch_SIF0, 0);
 	dmacSet_4_9_A(DMAch_SPU, 0);
 	dmacSet_4_9_A(DMAch_SIF0, 0);
 	dmacSet_4_9_A(DMAch_SIF1, 0);

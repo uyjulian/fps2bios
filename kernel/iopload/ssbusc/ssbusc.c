@@ -41,7 +41,7 @@ int return_0()
 }
 
 ///////////////////////////////////////////////////////////////////////
-int SSBUSsetTable1(int code, int value)
+int SetDelay(int code, int value)
 { //set
 	int* v;
 	if ((code < 13) && (v = (int*)memmap_table[code]))
@@ -50,7 +50,7 @@ int SSBUSsetTable1(int code, int value)
 }
 
 ///////////////////////////////////////////////////////////////////////
-int SSBUSgetTable1(int code)
+int GetDelay(int code)
 { //get
 	int* v;
 	if ((code < 13) && (v = (int*)memmap_table[code]))
@@ -59,7 +59,7 @@ int SSBUSgetTable1(int code)
 }
 
 ///////////////////////////////////////////////////////////////////////
-int SSBUSsetTable2(int code, int value)
+int SetBaseAddress(int code, int value)
 { //set
 	int* v;
 	if ((code < 13) && (v = (int*)memmap_table_2[code]))
@@ -68,7 +68,7 @@ int SSBUSsetTable2(int code, int value)
 }
 
 ///////////////////////////////////////////////////////////////////////
-int SSBUSgetTable2(int code)
+int GetBaseAddress(int code)
 { //get
 	int* v;
 	if ((code < 13) && (v = (int*)memmap_table_2[code]))
@@ -77,7 +77,7 @@ int SSBUSgetTable2(int code)
 }
 
 ///////////////////////////////////////////////////////////////////////
-int SSBUSsetCOM_DELAY_1st(int a)
+int SetRecoveryTime(int a)
 { //set lowest nibble
 	return *(int*)(0xBF801020) =
 			   (*(int*)(0xBF801020) & 0xFFFFFFF0) |
@@ -85,13 +85,13 @@ int SSBUSsetCOM_DELAY_1st(int a)
 }
 
 ///////////////////////////////////////////////////////////////////////
-int SSBUSgetCOM_DELAY_1st()
+int GetRecoveryTime()
 { //get lowest nibble
 	return *(int*)(0xBF801020) & 0xF;
 }
 
 ///////////////////////////////////////////////////////////////////////
-int SSBUSsetCOM_DELAY_2nd(int a)
+int SetHoldTime(int a)
 { //set
 	return *(int*)(0xBF801020) =
 			   (*(int*)(0xBF801020) & 0xFFFFFF0F) |
@@ -99,13 +99,13 @@ int SSBUSsetCOM_DELAY_2nd(int a)
 }
 
 ///////////////////////////////////////////////////////////////////////
-int SSBUSgetCOM_DELAY_2nd()
+int GetHoldTime()
 { //get
 	return *(unsigned char*)(0xBF801020) >> 4;
 }
 
 ///////////////////////////////////////////////////////////////////////
-int SSBUSsetCOM_DELAY_3rd(int a)
+int SetFloatTime(int a)
 { //set
 	return *(int*)(0xBF801020) =
 			   (*(int*)(0xBF801020) & 0xFFFFF0FF) |
@@ -113,13 +113,13 @@ int SSBUSsetCOM_DELAY_3rd(int a)
 }
 
 ///////////////////////////////////////////////////////////////////////
-int SSBUSgetCOM_DELAY_3rd()
+int GetFloatTime()
 { //get
 	return (*(int*)(0xBF801020) >> 8) & 0xF;
 }
 
 ///////////////////////////////////////////////////////////////////////
-int SSBUSsetCOM_DELAY_4th(int a)
+int SetStrobeTime(int a)
 { //set
 	return *(int*)(0xBF801020) =
 			   (*(int*)(0xBF801020) & 0xFFFF0FFF) |
@@ -127,19 +127,19 @@ int SSBUSsetCOM_DELAY_4th(int a)
 }
 
 ///////////////////////////////////////////////////////////////////////
-int SSBUSgetCOM_DELAY_4th()
+int GetStrobeTime()
 { //get
 	return (*(int*)(0xBF801020) >> 12) & 0xF;
 }
 
 ///////////////////////////////////////////////////////////////////////
-int SSBUSsetCOM_DELAY(int a)
+int SetCommonDelay(int a)
 { //set
 	return *(int*)(0xBF801020) = a;
 }
 
 ///////////////////////////////////////////////////////////////////////
-int SSBUSgetCOM_DELAY()
+int GetCommonDelay()
 { //get
 	return *(int*)(0xBF801020);
 }
@@ -158,20 +158,20 @@ struct export export_stub = {
 	(func)retonly,
 	(func)return_0,
 	(func)retonly,
-	(func)SSBUSsetTable1,
-	(func)SSBUSgetTable1,
-	(func)SSBUSsetTable2,
-	(func)SSBUSgetTable2,
-	(func)SSBUSsetCOM_DELAY_1st,
-	(func)SSBUSgetCOM_DELAY_1st,
-	(func)SSBUSsetCOM_DELAY_2nd,
-	(func)SSBUSgetCOM_DELAY_2nd,
-	(func)SSBUSsetCOM_DELAY_3rd,
-	(func)SSBUSgetCOM_DELAY_3rd,
-	(func)SSBUSsetCOM_DELAY_4th,
-	(func)SSBUSgetCOM_DELAY_4th,
-	(func)SSBUSsetCOM_DELAY,
-	(func)SSBUSgetCOM_DELAY,
+	(func)SetDelay,
+	(func)GetDelay,
+	(func)SetBaseAddress,
+	(func)GetBaseAddress,
+	(func)SetRecoveryTime,
+	(func)GetRecoveryTime,
+	(func)SetHoldTime,
+	(func)GetHoldTime,
+	(func)SetFloatTime,
+	(func)GetFloatTime,
+	(func)SetStrobeTime,
+	(func)GetStrobeTime,
+	(func)SetCommonDelay,
+	(func)GetCommonDelay,
 	0 // end of list
 };
 

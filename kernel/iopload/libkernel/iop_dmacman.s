@@ -20,28 +20,28 @@ dmacman_stub:
 	.ascii	"dmacman\0"
 	.align	2
 
-	.globl	dmacSetDMA			# 028
-dmacSetDMA:
+	.globl	dmac_request			# 028
+dmac_request:
 	j	$31
 	li	$0, 28
 
-	.globl	dmacStartTransfer	# 032
-dmacStartTransfer:
+	.globl	dmac_transfer	# 032
+dmac_transfer:
 	j	$31
 	li	$0, 32
 
-	.globl	dmacSetVal			# 033
-dmacSetVal:
+	.globl	dmac_ch_set_dpcr			# 033
+dmac_ch_set_dpcr:
 	j	$31
 	li	$0, 33
 
-	.globl	dmacEnableDMAch		# 034
-dmacEnableDMAch:
+	.globl	dmac_enable		# 034
+dmac_enable:
 	j	$31
 	li	$0, 34
 
-	.globl	dmacDisableDMAch	# 035
-dmacDisableDMAch:
+	.globl	dmac_disable	# 035
+dmac_disable:
 	j	$31
 	li	$0, 35
 

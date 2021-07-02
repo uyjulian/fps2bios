@@ -26,10 +26,10 @@ struct Chunk
 };
 
 void* CreateHeap(int chunkSize, int memoryType);
-int DestroyHeap(void* heap);
+int DeleteHeap(void* heap);
 
-void* HeapMalloc(void* heap, int size);
-int HeapFree(void* heap, void* mem);
-int HeapSize(void* heap);
+void* AllocHeapMemory(void* heap, int size);
+int FreeHeapMemory(void* heap, void* mem);
+int HeapTotalFreeSize(void* heap);
 
 #endif /* __HEAPLIB_H__ */

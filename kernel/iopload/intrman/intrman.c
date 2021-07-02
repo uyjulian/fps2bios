@@ -266,7 +266,7 @@ void intrman_syscall_14()
 }
 
 ///////////////////////////////////////////////////////////////////////
-void intrman_syscall_0C()
+void CpuInvokeInKmode()
 {
 	__asm__(
 		"li	 $3, 12\n"
@@ -420,7 +420,7 @@ end:
 
 ///////////////////////////////////////////////////////////////////////
 // Enable
-void intrman_call16(int interrupt)
+void EnableDispatchIntr(int interrupt)
 {
 	int ictrl;
 	CpuSuspendIntr(&ictrl);
@@ -445,7 +445,7 @@ void intrman_call16(int interrupt)
 
 ///////////////////////////////////////////////////////////////////////
 // Disable
-void intrman_call15(int interrupt)
+void DisableDispatchIntr(int interrupt)
 {
 	int ictrl;
 	CpuSuspendIntr(&ictrl);
@@ -697,9 +697,9 @@ struct export export_stub = {
 	(func)intrman_syscall_08,
 	(func)CpuGetICTRL,
 	(func)CpuEnableICTRL,
-	(func)intrman_syscall_0C, // 0x0E
-	(func)intrman_call15,
-	(func)intrman_call16, // 0x10
+	(func)CpuInvokeInKmode, // 0x0E
+	(func)DisableDispatchIntr,
+	(func)EnableDispatchIntr, // 0x10
 	(func)CpuSuspendIntr,
 	(func)CpuResumeIntr,
 	(func)CpuSuspendIntr,

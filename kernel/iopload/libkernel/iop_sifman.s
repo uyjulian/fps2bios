@@ -27,33 +27,33 @@ SifDeinit:
 	j	$31
 	li	$0, 0x03
 
-	.globl  SifSIF2Init			# 0x04
-SifSIF2Init:
+	.globl  sceSifDma2Init			# 0x04
+sceSifDma2Init:
 	j	$31
 	li	$0, 0x04
 
-	.globl  SifInit				# 0x05
-SifInit:
+	.globl  sceSifInit				# 0x05
+sceSifInit:
 	j	$31
 	li	$0, 0x05
 
-	.globl	SifSetDChain			# 0x06
-SifSetDChain:
+	.globl	sceSifSetDChain			# 0x06
+sceSifSetDChain:
 	j	$31
 	li	$0, 0x06
 
-	.globl	SifSetDma			# 0x07
-SifSetDma:
+	.globl	sceSifSetDma			# 0x07
+sceSifSetDma:
 	j	$31
 	li	$0, 0x07
 
-	.globl	SifDmaStat			# 0x08
-SifDmaStat:
+	.globl	sceSifDmaStat			# 0x08
+sceSifDmaStat:
 	j	$31
 	li	$0, 0x08
 
-	.globl	SifSend				# 0x09
-SifSend:
+	.globl	sceSifSetOneDma				# 0x09
+sceSifSetOneDma:
 	j	$31
 	li	$0, 0x09
 
@@ -67,103 +67,103 @@ SifIsSending:
 	j	$31
 	li	$0, 0x0B
 
-	.globl	SifSetSIF0DMA			# 0x0C
-SifSetSIF0DMA:
+	.globl	sceSifDma0Transfer			# 0x0C
+sceSifDma0Transfer:
 	j	$31
 	li	$0, 0x0C
 
-	.globl	SifSendSync0			# 0x0D
-SifSendSync0:
+	.globl	sceSifDma0Sync			# 0x0D
+sceSifDma0Sync:
 	j	$31
 	li	$0, 0x0D
 
-	.globl	SifIsSending0			# 0x0E
-SifIsSending0:
+	.globl	sceSifDma0Sending			# 0x0E
+sceSifDma0Sending:
 	j	$31
 	li	$0, 0x0E
 
-	.globl	SifSetSIF1DMA			# 0x0F
-SifSetSIF1DMA:
+	.globl	sceSifDma1Transfer			# 0x0F
+sceSifDma1Transfer:
 	j	$31
 	li	$0, 0x0F
 
-	.globl	SifSendSync1			# 0x10
-SifSendSync1:
+	.globl	sceSifDma1Sync			# 0x10
+sceSifDma1Sync:
 	j	$31
 	li	$0, 0x10
 
-	.globl	SifIsSending1			# 0x11
-SifIsSending1:
+	.globl	sceSifDma1Sending			# 0x11
+sceSifDma1Sending:
 	j	$31
 	li	$0, 0x11
 
-	.globl	SifSetSIF2DMA			# 0x12
-SifSetSIF2DMA:
+	.globl	sceSifDma2Transfer			# 0x12
+sceSifDma2Transfer:
 	j	$31
 	li	$0, 0x12
 
-	.globl	SifSendSync2			# 0x13
-SifSendSync2:
+	.globl	sceSifDma2Sync			# 0x13
+sceSifDma2Sync:
 	j	$31
 	li	$0, 0x13
 
-	.globl	SifIsSending2			# 0x14
-SifIsSending2:
+	.globl	sceSifDma2Sending			# 0x14
+sceSifDma2Sending:
 	j	$31
 	li	$0, 0x14
 
-	.globl	SifGetEEIOPflags		# 0x15
-SifGetEEIOPflags:
+	.globl	sceSifGetMSFlag		# 0x15
+sceSifGetMSFlag:
 	j	$31
 	li	$0, 0x15
 
-	.globl	SifSetEEIOPflags		# 0x16
-SifSetEEIOPflags:
+	.globl	sceSifSetMSFlag		# 0x16
+sceSifSetMSFlag:
 	j	$31
 	li	$0, 0x16
 
-	.globl	SifGetIOPEEflags		# 0x17
-SifGetIOPEEflags:
+	.globl	sceSifGetSMFlag		# 0x17
+sceSifGetSMFlag:
 	j	$31
 	li	$0, 0x17
 
-	.globl	SifSetIOPEEflags		# 0x18
-SifSetIOPEEflags:
+	.globl	sceSifSetSMFlag		# 0x18
+sceSifSetSMFlag:
 	j	$31
 	li	$0, 0x18
 
-	.globl	SifGetEErcvaddr			# 0x19
-SifGetEErcvaddr:
+	.globl	sceSifGetMainAddr			# 0x19
+sceSifGetMainAddr:
 	j	$31
 	li	$0, 0x19
 
-	.globl	SifGetIOPrcvaddr		# 0x1A
-SifGetIOPrcvaddr:
+	.globl	sceSifGetSubAddr		# 0x1A
+sceSifGetSubAddr:
 	j	$31
 	li	$0, 0x1A
 
-	.globl	SifSetIOPrcvaddr		# 0x1B
-SifSetIOPrcvaddr:
+	.globl	sceSifSetSubAddr		# 0x1B
+sceSifSetSubAddr:
 	j	$31
 	li	$0, 0x1B
 
-	.globl	SifSet1450_2			# 0x1C
-SifSet1450_2:
+	.globl	sceSifIntrMain			# 0x1C
+sceSifIntrMain:
 	j	$31
 	li	$0, 0x1C
 
-	.globl	SifCheckInit			# 0x1D
-SifCheckInit:
+	.globl	sceSifCheckInit			# 0x1D
+sceSifCheckInit:
 	j	$31
 	li	$0, 0x1D
 
-	.globl	SifSet0CB			# 0x1E
-SifSet0CB:
+	.globl	sceSifSetDmaIntrHandler			# 0x1E
+sceSifSetDmaIntrHandler:
 	j	$31
 	li	$0, 0x1E
 
-	.globl	SifReset0CB			# 0x1F
-SifReset0CB:
+	.globl	sceSifResetDmaIntrHandler			# 0x1F
+sceSifResetDmaIntrHandler:
 	j	$31
 	li	$0, 0x1F
 

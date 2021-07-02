@@ -86,7 +86,7 @@ int getBD3_loopchanging()
 }
 
 ///////////////////////////////////////////////////////////////////////[04]
-void SifSIF2Init()
+void sceSifDma2Init()
 {
 	if (sifSIF2Init != 0)
 		return;
@@ -98,7 +98,7 @@ void SifSIF2Init()
 }
 
 ///////////////////////////////////////////////////////////////////////[05]
-void SifInit()
+void sceSifInit()
 {
 	int x, y;
 	u32 msflag;
@@ -110,7 +110,7 @@ void SifInit()
 	DMAch_DPCR2 |= 0x8800; //enable dma ch. 9 and 10
 	DMAch_SIF9_CHCR = 0;
 	DMAch_SIFA_CHCR = 0;
-	SifSIF2Init();
+	sceSifDma2Init();
 
 	if (CONFIG_1450 & 0x10)
 		CONFIG_1450 |= 0x10;
@@ -131,8 +131,8 @@ void SifInit()
 
 	_dprintf("%s: EE ready\n", __FUNCTION__);
 	CpuResumeIntr(x); //intrman
-	SifSetDChain();
-	SifSetIOPrcvaddr(0); //sif1 receive buffer
+	sceSifSetDChain();
+	sceSifSetSubAddr(0); //sif1 receive buffer
 	BD3 = 0x10000; //IOPEE_sifman_init
 	BD3;
 	sifInit = 1;
@@ -153,13 +153,13 @@ void SifDeinit()
 }
 
 ///////////////////////////////////////////////////////////////////////[29]
-int SifCheckInit()
+int sceSifCheckInit()
 {
 	return sifInit;
 }
 
 ///////////////////////////////////////////////////////////////////////[06]
-void SifSetDChain()
+void sceSifSetDChain()
 {
 	if ((BD4 & 0x40) == 0)
 		BD4 = 0x40;
@@ -169,14 +169,14 @@ void SifSetDChain()
 }
 
 ///////////////////////////////////////////////////////////////////////[30]
-void SifSet0CB(int (*_function)(int), int _param)
+void sceSifSetDmaIntrHandler(int (*_function)(int), int _param)
 {
 	vars.function = _function;
 	vars.param = _param;
 }
 
 ///////////////////////////////////////////////////////////////////////[31]
-void SifReset0CB()
+void sceSifResetDmaIntrHandler()
 {
 	vars.function = NULL;
 	vars.param = 0;
@@ -240,7 +240,7 @@ void enqueue(struct sifman_DMA* psd)
 }
 
 ///////////////////////////////////////////////////////////////////////[07]
-u32 SifSetDma(struct sifman_DMA* psd, int len)
+u32 sceSifSetDma(struct sifman_DMA* psd, int len)
 {
 	int var_20;
 	register unsigned int ret;
@@ -281,7 +281,7 @@ u32 SifSetDma(struct sifman_DMA* psd, int len)
 }
 
 ///////////////////////////////////////////////////////////////////////[08]
-int SifDmaStat(u32 id)
+int sceSifDmaStat(u32 id)
 {
 	if (DMAch_SIF9_CHCR & DMAf_TR)
 	{
@@ -294,7 +294,7 @@ int SifDmaStat(u32 id)
 }
 
 ///////////////////////////////////////////////////////////////////////[09]
-void SifSend(struct sifman_DMA sd)
+void sceSifSetOneDma(struct sifman_DMA sd)
 {
 	sd.size = sd.size / 4 + ((sd.size & 3) > 0);
 	one.data = ((u32)sd.data & 0xFFFFFF) | 0x80000000;
@@ -330,7 +330,7 @@ int SifIsSending()
 }
 
 ///////////////////////////////////////////////////////////////////////[12]
-void SifSetSIF0DMA(void* data, int size, int attr)
+void sceSifDma0Transfer(void* data, int size, int attr)
 {
 	size = size / 4 + ((size & 3) > 0);
 
@@ -346,20 +346,20 @@ void SifSetSIF0DMA(void* data, int size, int attr)
 }
 
 ///////////////////////////////////////////////////////////////////////[13]
-void SifSendSync0()
+void sceSifDma0Sync()
 {
 	while (DMAch_SIF9_CHCR & DMAf_TR)
 		;
 }
 
 ///////////////////////////////////////////////////////////////////////[14]
-int SifIsSending0()
+int sceSifDma0Sending()
 {
 	return (DMAch_SIF9_CHCR & DMAf_TR);
 }
 
 ///////////////////////////////////////////////////////////////////////[15]
-void SifSetSIF1DMA(void* data, int size, int attr)
+void sceSifDma1Transfer(void* data, int size, int attr)
 {
 	size = size / 4 + ((size & 3) > 0);
 
@@ -376,20 +376,20 @@ void SifSetSIF1DMA(void* data, int size, int attr)
 }
 
 ///////////////////////////////////////////////////////////////////////[16]
-void SifSendSync1()
+void sceSifDma1Sync()
 {
 	while (DMAch_SIFA_CHCR & DMAf_TR)
 		;
 }
 
 ///////////////////////////////////////////////////////////////////////[17]
-int SifIsSending1()
+int sceSifDma1Sending()
 {
 	return (DMAch_SIFA_CHCR & DMAf_TR);
 }
 
 ///////////////////////////////////////////////////////////////////////[18]
-void SifSetSIF2DMA(void* data, int size, int attr)
+void sceSifDma2Transfer(void* data, int size, int attr)
 {
 	size = size / 4 + ((size & 3) > 0);
 
@@ -407,65 +407,65 @@ void SifSetSIF2DMA(void* data, int size, int attr)
 }
 
 ///////////////////////////////////////////////////////////////////////[19]
-void SifSendSync2()
+void sceSifDma2Sync()
 {
 	while (DMAch_SIF2_CHCR & DMAf_TR)
 		;
 }
 
 ///////////////////////////////////////////////////////////////////////[20]
-int SifIsSending2()
+int sceSifDma2Sending()
 {
 	return (DMAch_SIF2_CHCR & DMAf_TR);
 }
 
 ///////////////////////////////////////////////////////////////////////[21]
-int SifGetEEIOPflags()
+int sceSifGetMSFlag()
 {
 	return getBD2_loopchanging();
 }
 
 ///////////////////////////////////////////////////////////////////////[22]
-int SifSetEEIOPflags(int val)
+int sceSifSetMSFlag(int val)
 {
 	BD2 = val;
 	return getBD2_loopchanging();
 }
 
 ///////////////////////////////////////////////////////////////////////[23]
-int SifGetIOPEEflags()
+int sceSifGetSMFlag()
 {
 	return getBD3_loopchanging();
 }
 
 ///////////////////////////////////////////////////////////////////////[24]
-int SifSetIOPEEflags(int val)
+int sceSifSetSMFlag(int val)
 {
 	BD3 = val;
 	return getBD3_loopchanging();
 }
 
 ///////////////////////////////////////////////////////////////////////[25]
-int SifGetEErcvaddr()
+int sceSifGetMainAddr()
 {
 	return BD0;
 }
 
 ///////////////////////////////////////////////////////////////////////[26]
-int SifGetIOPrcvaddr()
+int sceSifGetSubAddr()
 {
 	return BD1;
 }
 
 ///////////////////////////////////////////////////////////////////////[27]
-int SifSetIOPrcvaddr(int val)
+int sceSifSetSubAddr(int val)
 {
 	BD1 = val;
 	return BD1;
 }
 
 ///////////////////////////////////////////////////////////////////////[28]
-void SifSet1450_2()
+void sceSifIntrMain()
 {
 	CONFIG_1450 |= 2;
 	CONFIG_1450 &= ~2;
@@ -486,34 +486,34 @@ struct export sifman_stub = {
 	(func)_retonly,
 	(func)SifDeinit,
 	(func)_retonly,
-	(func)SifSIF2Init,
-	(func)SifInit,
-	(func)SifSetDChain,
-	(func)SifSetDma,
-	(func)SifDmaStat,
-	(func)SifSend,
+	(func)sceSifDma2Init,
+	(func)sceSifInit,
+	(func)sceSifSetDChain,
+	(func)sceSifSetDma,
+	(func)sceSifDmaStat,
+	(func)sceSifSetOneDma,
 	(func)SifSendSync,
 	(func)SifIsSending,
-	(func)SifSetSIF0DMA,
-	(func)SifSendSync0,
-	(func)SifIsSending0,
-	(func)SifSetSIF1DMA,
-	(func)SifSendSync1,
-	(func)SifIsSending1,
-	(func)SifSetSIF2DMA,
-	(func)SifSendSync2,
-	(func)SifIsSending2,
-	(func)SifGetEEIOPflags,
-	(func)SifSetEEIOPflags,
-	(func)SifGetIOPEEflags,
-	(func)SifSetIOPEEflags,
-	(func)SifGetEErcvaddr,
-	(func)SifGetIOPrcvaddr,
-	(func)SifSetIOPrcvaddr,
-	(func)SifSet1450_2,
-	(func)SifCheckInit,
-	(func)SifSet0CB,
-	(func)SifReset0CB,
+	(func)sceSifDma0Transfer,
+	(func)sceSifDma0Sync,
+	(func)sceSifDma0Sending,
+	(func)sceSifDma1Transfer,
+	(func)sceSifDma1Sync,
+	(func)sceSifDma1Sending,
+	(func)sceSifDma2Transfer,
+	(func)sceSifDma2Sync,
+	(func)sceSifDma2Sending,
+	(func)sceSifGetMSFlag,
+	(func)sceSifSetMSFlag,
+	(func)sceSifGetSMFlag,
+	(func)sceSifSetSMFlag,
+	(func)sceSifGetMainAddr,
+	(func)sceSifGetSubAddr,
+	(func)sceSifSetSubAddr,
+	(func)sceSifIntrMain,
+	(func)sceSifCheckInit,
+	(func)sceSifSetDmaIntrHandler,
+	(func)sceSifResetDmaIntrHandler,
 	(func)_retonly,
 	(func)_retonly,
 	(func)_retonly,

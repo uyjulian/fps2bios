@@ -105,7 +105,7 @@ void* CreateHeap(int chunkSize, int memoryType)
 }
 
 ///////////////////////////////////////////////////////////////////////
-int DestroyHeap(void* heap)
+int DeleteHeap(void* heap)
 {
 	register struct ll *tmp, *p;
 	struct Heap* _heap = (struct Heap*)heap;
@@ -125,7 +125,7 @@ int DestroyHeap(void* heap)
 }
 
 ///////////////////////////////////////////////////////////////////////
-void* HeapMalloc(void* heap, int size)
+void* AllocHeapMemory(void* heap, int size)
 {
 #if 0
 	struct Heap *_heap = (struct Heap*)heap;
@@ -142,7 +142,7 @@ void* HeapMalloc(void* heap, int size)
 #endif
 }
 
-int HeapFree(void* heap, void* mem)
+int FreeHeapMemory(void* heap, void* mem)
 {
 	struct Heap* _heap = (struct Heap*)heap;
 	struct Heap* h;
@@ -170,7 +170,7 @@ int HeapFree(void* heap, void* mem)
 	return 0;
 }
 
-int HeapSize(void* heap)
+int HeapTotalFreeSize(void* heap)
 {
 	struct Heap* _heap = (struct Heap*)heap;
 
@@ -213,10 +213,10 @@ struct export heaplib_stub = {
 	(func)_retonly,
 	(func)_retonly,
 	(func)CreateHeap,
-	(func)DestroyHeap,
-	(func)HeapMalloc,
-	(func)HeapFree,
-	(func)HeapSize,
+	(func)DeleteHeap,
+	(func)AllocHeapMemory,
+	(func)FreeHeapMemory,
+	(func)HeapTotalFreeSize,
 	(func)_retonly,
 	(func)_retonly,
 	(func)HeapPrepare,

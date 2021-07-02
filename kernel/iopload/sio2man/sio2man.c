@@ -76,28 +76,28 @@ int _start(void);
 void nullSub(void);
 int sio2_init(void);
 void sio2_deInit(void);
-void sio2_setCtrl(u32 arg0);
-u32 sio2_getCtrl(void);
-u32 sio2_getRecv1(void);
-void sio2_setSend1(int entryNum, u32 val);
-u32 sio2_getSend1(int entryNum);
-void sio2_setSend2(int entryNum, u32 val);
-u32 sio2_getSend2(int entryNum);
-u32 sio2_getRecv2(void);
-void sio2_setSend3(int entryNum, u32 val);
-u32 sio2_getSend3(int entryNum);
-u32 sio2_getRecv3(void);
-void sio2_set8278(u32 arg0);
-u32 sio2_get8278(void);
-void sio2_set827C(u32 arg0);
-u32 sio2_get827C(void);
-void sio2_datain(u8 arg0);
-u8 sio2_dataout(void);
-void sio2_setIntr(u32 arg0);
-u32 sio2_getIntr(void);
-void sio2_signalExchange1(void);
-void sio2_signalExchange2(void);
-int sio2_packetExchange(struct sio2_packet* packet);
+void sio2_ctrl_set(u32 arg0);
+u32 sio2_ctrl_get(void);
+u32 sio2_stat6c_get(void);
+void sio2_portN_ctrl1_set(int entryNum, u32 val);
+u32 sio2_portN_ctrl1_get(int entryNum);
+void sio2_portN_ctrl2_set(int entryNum, u32 val);
+u32 sio2_portN_ctrl2_get(int entryNum);
+u32 sio2_stat70_get(void);
+void sio2_regN_set(int entryNum, u32 val);
+u32 sio2_regN_get(int entryNum);
+u32 sio2_stat74_get(void);
+void sio2_unkn78_set(u32 arg0);
+u32 sio2_unkn78_get(void);
+void sio2_unkn7c_set(u32 arg0);
+u32 sio2_unkn7c_get(void);
+void sio2_data_out(u8 arg0);
+u8 sio2_data_in(void);
+void sio2_stat_set(u32 arg0);
+u32 sio2_stat_get(void);
+void sio2_pad_transfer_init(void);
+void sio2_mc_transfer_init(void);
+int sio2_transfer(struct sio2_packet* packet);
 
 struct export sio2man_stub = {
 	0x41C00000,
@@ -109,28 +109,28 @@ struct export sio2man_stub = {
 	(func)nullSub,
 	(func)sio2_deInit,
 	(func)nullSub,
-	(func)sio2_setCtrl, // 4
-	(func)sio2_getCtrl,
-	(func)sio2_getRecv1,
-	(func)sio2_setSend1,
-	(func)sio2_getSend1, // 8
-	(func)sio2_setSend2,
-	(func)sio2_getSend2,
-	(func)sio2_getRecv2,
-	(func)sio2_setSend3, // 12
-	(func)sio2_getSend3,
-	(func)sio2_getRecv3,
-	(func)sio2_set8278,
-	(func)sio2_get8278, // 16
-	(func)sio2_set827C,
-	(func)sio2_get827C,
-	(func)sio2_datain,
-	(func)sio2_dataout, // 20
-	(func)sio2_setIntr,
-	(func)sio2_getIntr,
-	(func)sio2_signalExchange1,
-	(func)sio2_signalExchange2, // 24
-	(func)sio2_packetExchange,
+	(func)sio2_ctrl_set, // 4
+	(func)sio2_ctrl_get,
+	(func)sio2_stat6c_get,
+	(func)sio2_portN_ctrl1_set,
+	(func)sio2_portN_ctrl1_get, // 8
+	(func)sio2_portN_ctrl2_set,
+	(func)sio2_portN_ctrl2_get,
+	(func)sio2_stat70_get,
+	(func)sio2_regN_set, // 12
+	(func)sio2_regN_get,
+	(func)sio2_stat74_get,
+	(func)sio2_unkn78_set,
+	(func)sio2_unkn78_get, // 16
+	(func)sio2_unkn7c_set,
+	(func)sio2_unkn7c_get,
+	(func)sio2_data_out,
+	(func)sio2_data_in, // 20
+	(func)sio2_stat_set,
+	(func)sio2_stat_get,
+	(func)sio2_pad_transfer_init,
+	(func)sio2_mc_transfer_init, // 24
+	(func)sio2_transfer,
 	0};
 
 #define INUM_sio2 17
@@ -144,22 +144,22 @@ int _start(void)
 
 void nullSub(void) { return; }
 
-void sio2_setCtrl(u32 arg0)
+void sio2_ctrl_set(u32 arg0)
 {
 	*(u32*)(0xBF808268) = arg0;
 }
 
-u32 sio2_getCtrl(void)
+u32 sio2_ctrl_get(void)
 {
 	return (*(u32*)(0xBF808268));
 }
 
-u32 sio2_getRecv1(void)
+u32 sio2_stat6c_get(void)
 {
 	return (*(u32*)(0xBF80826C));
 }
 
-void sio2_setSend1(int entryNum, u32 val)
+void sio2_portN_ctrl1_set(int entryNum, u32 val)
 {
 	switch (entryNum)
 	{
@@ -178,7 +178,7 @@ void sio2_setSend1(int entryNum, u32 val)
 	}
 }
 
-u32 sio2_getSend1(int entryNum)
+u32 sio2_portN_ctrl1_get(int entryNum)
 {
 	switch (entryNum)
 	{
@@ -195,7 +195,7 @@ u32 sio2_getSend1(int entryNum)
 	return (0);
 }
 
-void sio2_setSend2(int entryNum, u32 val)
+void sio2_portN_ctrl2_set(int entryNum, u32 val)
 {
 	switch (entryNum)
 	{
@@ -214,7 +214,7 @@ void sio2_setSend2(int entryNum, u32 val)
 	}
 }
 
-u32 sio2_getSend2(int entryNum)
+u32 sio2_portN_ctrl2_get(int entryNum)
 {
 	switch (entryNum)
 	{
@@ -231,18 +231,18 @@ u32 sio2_getSend2(int entryNum)
 	return (0);
 }
 
-u32 sio2_getRecv2(void)
+u32 sio2_stat70_get(void)
 {
 	return (*(u32*)(0xBF808270));
 }
 
-void sio2_setSend3(int entryNum, u32 val)
+void sio2_regN_set(int entryNum, u32 val)
 {
 	if (entryNum < 16)
 		*(u32*)(0xBF808200 + (entryNum * 4)) = val;
 }
 
-u32 sio2_getSend3(int entryNum)
+u32 sio2_regN_get(int entryNum)
 {
 	if (entryNum < 16)
 		return (*(u32*)(0xBF808200 + (entryNum * 4)));
@@ -250,47 +250,47 @@ u32 sio2_getSend3(int entryNum)
 	return (-1);
 }
 
-u32 sio2_getRecv3(void)
+u32 sio2_stat74_get(void)
 {
 	return (*(u32*)(0xBF808274));
 }
 
-void sio2_set8278(u32 arg0)
+void sio2_unkn78_set(u32 arg0)
 {
 	*(u32*)(0xBF808278) = arg0;
 }
 
-u32 sio2_get8278(void)
+u32 sio2_unkn78_get(void)
 {
 	return (*(u32*)(0xBF808278));
 }
 
-void sio2_set827C(u32 arg0)
+void sio2_unkn7c_set(u32 arg0)
 {
 	*(u32*)(0xBF80827C) = arg0;
 }
 
-u32 sio2_get827C(void)
+u32 sio2_unkn7c_get(void)
 {
 	return (*(u32*)(0xBF80827C));
 }
 
-void sio2_datain(u8 arg0)
+void sio2_data_out(u8 arg0)
 {
 	*(u8*)(0xBF808260) = arg0;
 }
 
-u8 sio2_dataout(void)
+u8 sio2_data_in(void)
 {
 	return (*(u8*)(0xBF808264));
 }
 
-void sio2_setIntr(u32 arg0)
+void sio2_stat_set(u32 arg0)
 {
 	*(u32*)(0xBF808280) = arg0;
 }
 
-u32 sio2_getIntr(void)
+u32 sio2_stat_get(void)
 {
 	return (*(u32*)(0xBF808280));
 }
@@ -328,12 +328,12 @@ void sio2_sendPacket(struct sio2_packet* p)
 
 	for (i = 0; i < 4; i++)
 	{
-		sio2_setSend1(i, p->sendArray1[i]);
-		sio2_setSend2(i, p->sendArray2[i]);
+		sio2_portN_ctrl1_set(i, p->sendArray1[i]);
+		sio2_portN_ctrl2_set(i, p->sendArray2[i]);
 	}
 
 	for (i = 0; i < 16; i++)
-		sio2_setSend3(i, p->sendArray3[i]);
+		sio2_regN_set(i, p->sendArray3[i]);
 
 	if (p->sendSize)
 	{
@@ -350,14 +350,14 @@ void sio2_sendPacket(struct sio2_packet* p)
 	{
 		_dprintf("dmaAddress1=%x, dmacSize1=%x, dmacCount1=%x\n", p->dmacAddress1, p->dmacSize1, p->dmacCount1);
 		dumpbuf((u8*)p->dmacAddress1, p->dmacSize1 * p->dmacCount1);
-		dmacSetDMA(DMAch_SIO2in, p->dmacAddress1, p->dmacSize1, p->dmacCount1, 1); // from memory
-		dmacStartTransfer(DMAch_SIO2in);
+		dmac_request(DMAch_SIO2in, p->dmacAddress1, p->dmacSize1, p->dmacCount1, 1); // from memory
+		dmac_transfer(DMAch_SIO2in);
 	}
 
 	if (p->dmacAddress2 != 0)
 	{
-		dmacSetDMA(DMAch_SIO2out, p->dmacAddress2, p->dmacSize2, p->dmacCount2, 0); // to memory
-		dmacStartTransfer(DMAch_SIO2out);
+		dmac_request(DMAch_SIO2out, p->dmacAddress2, p->dmacSize2, p->dmacCount2, 0); // to memory
+		dmac_transfer(DMAch_SIO2out);
 	}
 }
 
@@ -452,7 +452,7 @@ int sio2_createBasicThread(void)
 
 int sio2_interruptHandler(struct sio2common* c)
 {
-	sio2_setIntr(sio2_getIntr());
+	sio2_stat_set(sio2_stat_get());
 
 	iSetEventFlag(c->evid, 0x80);
 
@@ -492,10 +492,10 @@ int sio2_init(void)
 
 	CpuResumeIntr(oldStat);
 
-	dmacSetVal(DMAch_SIO2in, 0x03);
-	dmacSetVal(DMAch_SIO2out, 0x03);
-	dmacEnableDMAch(DMAch_SIO2in);
-	dmacEnableDMAch(DMAch_SIO2out);
+	dmac_ch_set_dpcr(DMAch_SIO2in, 0x03);
+	dmac_ch_set_dpcr(DMAch_SIO2out, 0x03);
+	dmac_enable(DMAch_SIO2in);
+	dmac_enable(DMAch_SIO2out);
 
 	StartThread(common.thid, 0); // Start the "basicThread"
 
@@ -515,11 +515,11 @@ void sio2_deInit(void)
 
 	CpuResumeIntr(oldStat);
 
-	dmacDisableDMAch(DMAch_SIO2in);
-	dmacDisableDMAch(DMAch_SIO2out);
+	dmac_disable(DMAch_SIO2in);
+	dmac_disable(DMAch_SIO2out);
 }
 
-void sio2_signalExchange1(void)
+void sio2_pad_transfer_init(void)
 {
 	//	_dprintf("%s\n", __FUNCTION__);
 
@@ -530,7 +530,7 @@ void sio2_signalExchange1(void)
 	ClearEventFlag(common.evid, ~0x2);
 }
 
-void sio2_signalExchange2(void)
+void sio2_mc_transfer_init(void)
 {
 	//	_dprintf("%s\n", __FUNCTION__);
 
@@ -541,7 +541,7 @@ void sio2_signalExchange2(void)
 	ClearEventFlag(common.evid, ~0x8);
 }
 
-int sio2_packetExchange(struct sio2_packet* packet)
+int sio2_transfer(struct sio2_packet* packet)
 {
 	//	_dprintf("%s: %x\n", __FUNCTION__, packet);
 
