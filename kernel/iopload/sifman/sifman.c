@@ -317,14 +317,14 @@ void sceSifSetOneDma(struct sifman_DMA sd)
 }
 
 ///////////////////////////////////////////////////////////////////////[10]
-void SifSendSync()
+void sceSifSendSync()
 {
 	while (DMAch_SIF9_CHCR & DMAf_TR)
 		;
 }
 
 ///////////////////////////////////////////////////////////////////////[11]
-int SifIsSending()
+int sceSifIsSending()
 {
 	return (DMAch_SIF9_CHCR & DMAf_TR);
 }
@@ -492,8 +492,8 @@ struct export sifman_stub = {
 	(func)sceSifSetDma,
 	(func)sceSifDmaStat,
 	(func)sceSifSetOneDma,
-	(func)SifSendSync,
-	(func)SifIsSending,
+	(func)sceSifSendSync,
+	(func)sceSifIsSending,
 	(func)sceSifDma0Transfer,
 	(func)sceSifDma0Sync,
 	(func)sceSifDma0Sending,

@@ -57,38 +57,38 @@
 int dmacman_start(int argc, char* argv[]); // 0
 int dmacman_deinit(); // 2
 
-void dmacman_call4_SetD_MADR(unsigned int ch, int value); // 4
-int dmacman_call5_GetD_MADR(unsigned int ch); // 5
-void dmacman_call6_SetD_BCR(unsigned int ch, int value); // 6
-int dmacman_call7_GetD_BCR(unsigned int ch); // 7
-void dmacman_call8_SetD_CHCR(unsigned int ch, int value); // 8
-int dmacman_call9_GetD_CHCR(unsigned int ch); // 9
-void dmacman_call10_SetD_TADR(unsigned int ch, int value); //10
-int dmacman_call11_GetD_TADR(unsigned int ch); //11
-void dmacman_call12_Set_4_9_A(unsigned int ch, int value); //12
-int dmacman_call13_Get_4_9_A(unsigned int ch); //13
-void dmacman_call14_SetDPCR(int value); //14
-int dmacman_call15_GetDPCR(); //15
-void dmacman_call16_SetDPCR2(int value); //16
-int dmacman_call17_GetDPCR2(); //17
-void dmacman_call18_SetDPCR3(int value); //18
-int dmacman_call19_GetDPCR3(); //19
-void dmacman_call20_SetDICR(int value); //20
-int dmacman_call21_GetDICR(); //21
-void dmacman_call22_SetDICR2(int value); //22
-int dmacman_call23_GetDICR2(); //23
-void dmacman_call24_setBF80157C(int value); //24
-int dmacman_call25_getBF80157C(); //25
-void dmacman_call26_setBF801578(int value); //26
-int dmacman_call27_getBF801578(); //27
-int dmacman_call28_SetDMA(int ch, int address, int size, int count, int dir); //28
-int dmacman_call29_SetDMA_chainedSPU_SIF0(int ch, int size, int c); //29
-int dmacman_call30_SetDMA_SIF0(int ch, int size, int c); //30
-int dmacman_call31_SetDMA_SIF1(int ch, int size); //31
-void dmacman_call32_StartTransfer(int ch); //32
-void dmacman_call33_SetVal(int ch, int value); //33
-void dmacman_call34_EnableDMAch(int ch); //34
-void dmacman_call35_DisableDMAch(int ch); //35
+void dmac_ch_set_madr(unsigned int ch, int value); // 4
+int dmac_ch_get_madr(unsigned int ch); // 5
+void dmac_ch_set_bcr(unsigned int ch, int value); // 6
+int dmac_ch_get_bcr(unsigned int ch); // 7
+void dmac_ch_set_chcr(unsigned int ch, int value); // 8
+int dmac_ch_get_chcr(unsigned int ch); // 9
+void dmac_ch_set_tadr(unsigned int ch, int value); //10
+int dmac_ch_get_tadr(unsigned int ch); //11
+void dmac_set_4_9_a(unsigned int ch, int value); //12
+int dmac_get_4_9_a(unsigned int ch); //13
+void dmac_set_dpcr(int value); //14
+int dmac_get_dpcr(); //15
+void dmac_set_dpcr2(int value); //16
+int dmac_get_dpcr2(); //17
+void dmac_set_dpcr3(int value); //18
+int dmac_get_dpcr3(); //19
+void dmac_set_dicr(int value); //20
+int dmac_get_dicr(); //21
+void dmac_set_dicr2(int value); //22
+int dmac_get_dicr2(); //23
+void dmac_set_BF80157C(int value); //24
+int dmac_get_BF80157C(); //25
+void dmac_set_BF801578(int value); //26
+int dmac_get_BF801578(); //27
+int dmac_request(int ch, int address, int size, int count, int dir); //28
+int dmac_set_dma_chained_spu_sif0(int ch, int size, int c); //29
+int dmac_set_dma_sif0(int ch, int size, int c); //30
+int dmac_set_dma_sif1(int ch, int size); //31
+void dmac_transfer(int ch); //32
+void dmac_ch_set_dpcr(int ch, int value); //33
+void dmac_enable(int ch); //34
+void dmac_disable(int ch); //35
 
 //SIF2 DMA ch 2 (GPU)
 #define DMAch_SIF2_MADR (*(volatile int*)0xBF8010A0)

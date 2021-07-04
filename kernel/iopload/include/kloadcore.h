@@ -89,7 +89,7 @@ void FlushIcache(); //4 (14)
 void FlushDcache(); //5 (14,21,26)
 int RegisterLibraryEntries(struct export*); //6 (05,06,07,13,14,17,18,28)
 u32* QueryBootMode(int code); //12(11,21,25,26,28)
-int loadcore_call20_registerFunc(int (*function)(int*, int), int a1, int* result);
+int RegisterPostBootCallback(int (*function)(int*, int), int a1, int* result);
 //20(28)
 
 #endif //__LOADCORE_H__

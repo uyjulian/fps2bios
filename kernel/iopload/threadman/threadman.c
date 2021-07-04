@@ -240,8 +240,8 @@ int thbase_start(int argc, char* argv[]){
 	if (v0=QueryBootMode(4))
 		SetEventFlag(systemStatusFlag, 1<<(v0->H0 & 3));//H0 short
 
-	loadcore_call20_registerFunc(&lc20_2, 2, 0);
-	loadcore_call20_registerFunc(&lc20_3, 3, 0);
+	RegisterPostBootCallback(&lc20_2, 2, 0);
+	RegisterPostBootCallback(&lc20_3, 3, 0);
 	CpuEnableIntr();
 	return 0;
 }
